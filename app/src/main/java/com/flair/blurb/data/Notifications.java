@@ -1,13 +1,9 @@
 package com.flair.blurb.data;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
-import com.flair.blurb.BlurbNotificationService;
 import com.flair.blurb.Constants;
 import com.flair.blurb.R;
 
@@ -15,7 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import static com.flair.blurb.Util.addNotificationExtras;
 import static com.flair.blurb.Util.getKey;
+import static com.flair.blurb.Util.mergeNotifications;
 
 /**
  * Created by sivaram-3911 on 13/01/17.
@@ -51,26 +49,24 @@ public class Notifications {
 
         String key = getKey(notification);
 
-        Log.d(TAG, "addNotification: "+key);
+        Log.d(TAG, "addNotification: "+category+" key "+key);
 
-        notification.getNotification().defaults = 0;    //Disables vibration
-        notification.getNotification().sound = null;    //Disables sound
-        notification.getNotification().deleteIntent = PendingIntent.getService(
-                context,
-                Constants.REQUEST_DELETE_NOTIFICATION,
-                new Intent(context, BlurbNotificationService.class)
-                        .putExtra(intent_request_key, Constants.REQUEST_DELETE_NOTIFICATION)
-                        .putExtra(intent_notification_key, key)
-                        .putExtra(intent_category_key, category)
-                .setAction(System.currentTimeMillis()+""),
-                PendingIntent.FLAG_ONE_SHOT); //Set delete intent
-        notification.getNotification().flags = notification.getNotification().flags | Notification.FLAG_AUTO_CANCEL;
         HashMap<String, StatusBarNotification> map = getMapByCategory(category);
+
+        addNotificationExtras(context, notification, category, key);
+
+        mergeNotifications(map, notification);
+
         map.put(key, notification);
     }
 
     public void removeNotification(String category, String key) {
-        HashMap<String, StatusBarNotification> map = getMapByCategory(category);
+        HashMap<String, StatusBarNotification> map;
+        if(category == null) {
+            map = social.containsKey(key)? social : (news.containsKey(key)? news : (system.containsKey(key)? system : rest));
+        } else {
+            map = getMapByCategory(category);
+        }
         Log.d(TAG, "deleteNotification: category " + category + " key " + key);
 
         if (map != null && map.containsKey(key)) {
@@ -153,5 +149,24 @@ public class Notifications {
                 return news;
         }
         return null;
+    }
+
+    public int getMapSizeByCategory(@Constants.CategoryDef String category) {
+        switch (category) {
+            case Constants.CATEGORY_SOCIAL:
+                return social.size();
+            case Constants.CATEGORY_NEWS:
+                return news.size();
+            case Constants.CATEGORY_SYSTEM:
+                return system.size();
+            case Constants.CATEGORY_UNCATEGORIZED:
+            case "":
+                return rest.size();
+        }
+        return 0;
+    }
+
+    public int size() {
+        return social.size() + news.size() + system.size() + rest.size();
     }
 }

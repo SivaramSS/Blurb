@@ -28,6 +28,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 public class BlurbHelper {
 
     private static BlurbHelper ourInstance = new BlurbHelper();
+    RemoteViews contentView;
 
     public static BlurbHelper getInstance() {
         return ourInstance;
@@ -66,12 +67,9 @@ public class BlurbHelper {
         return category;
     }
 
-    void postBlurbNotification(Context context) {
+    NotificationCompat.Builder postBlurbNotification(Context context) {
         NotificationManager nm = ((NotificationManager) context.getSystemService(NOTIFICATION_SERVICE));
-        RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.blurb_ongoing);
-
-        Intent socialIntent = new Intent();
-        socialIntent.putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_SOCIAL);
+        contentView = new RemoteViews(context.getPackageName(), R.layout.blurb_ongoing);
 
         PendingIntent social = PendingIntent.getService(context, Constants.REQUEST_CODE_SOCIAL, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_SOCIAL), PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent news = PendingIntent.getService(context, Constants.REQUEST_CODE_NEWS, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_NEWS), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -83,14 +81,22 @@ public class BlurbHelper {
         contentView.setOnClickPendingIntent(R.id.system, system);
         contentView.setOnClickPendingIntent(R.id.more, more);
 
-        Notification notification = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+        contentView.setTextViewText(R.id.social_count, 0 + "");
+        contentView.setTextViewText(R.id.news_count, 0 + "");
+        contentView.setTextViewText(R.id.system_count, 0 + "");
+        contentView.setTextViewText(R.id.rest_count, 0 + "");
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        builder.setSmallIcon(R.mipmap.ic_launcher)
                 .setContent(contentView)
                 .setPriority(Notification.PRIORITY_MIN)
-                .setOngoing(true)
-                .build();
+                .setOngoing(true);
 
-        nm.notify(Constants.BLURB_NOTIFICATION_ID, notification);
+        nm.notify(Constants.BLURB_NOTIFICATION_ID, builder.build());
+        return builder;
     }
 
+    public RemoteViews getContentView() {
+        return contentView;
+    }
 }
