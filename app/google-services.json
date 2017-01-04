@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "815481315212",
+    "firebase_url": "https://blurb-ecc51.firebaseio.com",
+    "project_id": "blurb-ecc51",
+    "storage_bucket": "blurb-ecc51.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:815481315212:android:d9f796ac64f5736f",
+        "android_client_info": {
+          "package_name": "com.flair.blurb"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "815481315212-ros8hkder93u199jlhncabjg3cr2mloa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.flair.blurb",
+            "certificate_hash": "3ADDAD9C3CC08105B37FDE332A9E9FC1F707E5A8"
+          }
+        },
+        {
+          "client_id": "815481315212-1koep3uku1tk5ccs7k6midd2rt69u5kf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_BHfAc1BhljWvLomM_sHuY021Ce9C9qY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "815481315212-1koep3uku1tk5ccs7k6midd2rt69u5kf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
