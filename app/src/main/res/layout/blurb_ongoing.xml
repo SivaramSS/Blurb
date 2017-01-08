@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:id="@+id/social"
+        android:layout_width="0dp"
+        android:layout_gravity="center_vertical"
+        android:layout_height="@dimen/icon_container_dimension"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_weight="1">
+
+        <ImageView
+            android:layout_width="@dimen/icon_dimension"
+            android:layout_height="@dimen/icon_dimension"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_social" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/news"
+        android:layout_width="0dp"
+        android:layout_gravity="center_vertical"
+        android:layout_height="@dimen/icon_container_dimension"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_weight="1">
+
+        <ImageView
+            android:layout_width="@dimen/icon_dimension"
+            android:layout_height="@dimen/icon_dimension"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_news" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/system"
+        android:layout_width="0dp"
+        android:layout_gravity="center_vertical"
+        android:layout_height="@dimen/icon_container_dimension"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_weight="1">
+
+        <ImageView
+            android:layout_width="@dimen/icon_dimension"
+            android:layout_height="@dimen/icon_dimension"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_settings" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/more"
+        android:layout_width="0dp"
+        android:layout_gravity="center_vertical"
+        android:layout_height="@dimen/icon_container_dimension"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_weight="1">
+
+        <ImageView
+            android:layout_width="@dimen/icon_dimension"
+            android:layout_height="@dimen/icon_dimension"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_more" />
+
+    </FrameLayout>
+</LinearLayout>
