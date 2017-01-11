@@ -20,6 +20,8 @@ public class App {
     static final int REQUEST_CODE_SYSTEM = 3333;
     static final int REQUEST_CODE_MORE = 4444;
 
+    static final int REQUEST_DELETE_NOTIFICATION = 7777;
+
     String pkgname, category;
 
     public App() {

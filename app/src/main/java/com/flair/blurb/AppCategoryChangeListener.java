@@ -26,7 +26,7 @@ public class AppCategoryChangeListener implements ValueEventListener {
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        if (dataSnapshot == null) {
+        if (dataSnapshot == null || dataSnapshot.getValue() == null) {
             writeNode.child(pkgname).setValue(category);
         } else {
             notifier.notifyCategoryChanged(dataSnapshot.getKey(), ((String) dataSnapshot.getValue()));
