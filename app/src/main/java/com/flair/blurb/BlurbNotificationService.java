@@ -1,16 +1,18 @@
 package com.flair.blurb;
 
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Build;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
+import com.flair.blurb.data.Apps;
+import com.flair.blurb.data.Notifications;
+import com.flair.blurb.firebase.DataChangeNotfier;
+
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Created by sivaram-3911 on 24/12/16.
@@ -23,27 +25,19 @@ public class BlurbNotificationService extends NotificationListenerService implem
      * Maintains categorized active notifications
      */
     BlurbHelper helper;
-    boolean isApi18 = false;
 
-    HashMap<String, StatusBarNotification> important, social, system, promotions, news, rest;
-    HashMap<String, String> apps;
     int nCounter;
     boolean dnd;
-    String notification_key, intent_key, category_key;
     String posted_by_blurb;
+    @Constants.CategoryDef
     String default_category;
     NotificationManager notificationManager;
+    Notifications activeNotifications;
+    Apps applist;
 
     public BlurbNotificationService() {
         super();
         helper = BlurbHelper.getInstance();
-        important = new HashMap<>();
-        apps = new HashMap<>();
-        social = new HashMap<>();
-        system = new HashMap<>();
-        promotions = new HashMap<>();
-        news = new HashMap<>();
-        rest = new HashMap<>();
         this.nCounter = 0;
         this.dnd = false;
     }
@@ -61,49 +55,31 @@ public class BlurbNotificationService extends NotificationListenerService implem
     public void onListenerConnected() {
         super.onListenerConnected();
         Log.d(TAG, "onListenerConnected: ");
-        isApi18 = Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH;
-        intent_key = getString(R.string.intent_key);
-        notification_key = getString(R.string.notification_key);
-        category_key = getString(R.string.category_key);
-        posted_by_blurb = getString(R.string.posted_by_blurb);
-        default_category = helper.defaultCategoryToShow(this);
         notificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
+        default_category = helper.defaultCategoryToShow(this);
+        posted_by_blurb = getString(R.string.posted_by_blurb);
+
+        activeNotifications = new Notifications(this);
+        applist = new Apps();
 
         helper.categorizeInstalledApps(this, this);
+        helper.postBlurbNotification(this);
+
+        //Categorize active notifcations and post only default_category
         StatusBarNotification[] notifications = getActiveNotifications();
         for (StatusBarNotification notification : notifications) {
             classifyNotification(notification);
-        }
-        helper.postBlurbNotification(this);
-        dismissAllNotifications();
-        //Post default_category notifications
-        Map<String, StatusBarNotification> map = getMapByCategory(default_category);
-        Iterator<StatusBarNotification> iter = map.values().iterator();
-        while (iter.hasNext()) {
-            postNotification(iter.next());
         }
     }
 
     @Override
     public void onNotificationPosted(StatusBarNotification statusBarNotification) {
-        String tag = statusBarNotification.getTag();
-        Log.d(TAG, "onNotificationPosted: posted notification " + statusBarNotification.getPackageName() + " " + BlurbHelper.getKey(statusBarNotification));
-        if (tag == null || !posted_by_blurb.equals(statusBarNotification.getTag())) { //Omit classifying notifications posted by blurb
-            String cat = classifyNotification(statusBarNotification);
-//            if (cat!=null && !cat.equals(default_category)) {
-//                //Change needed..
-//                // TODO all non blurb notifications must be dismissed - default category notifications must be posted again inorder to maintain delete intent
-//                dismissNotification(statusBarNotification);
-//            }
-            dismissNotification(statusBarNotification);
-            if (cat != null && cat.equals(default_category)) {
-                postNotification(statusBarNotification);
-            }
-        }
+        classifyNotification(statusBarNotification);
     }
 
     @Override
     public void onNotificationRemoved(StatusBarNotification statusBarNotification) {
+        Log.d(TAG, "onNotificationRemoved: "+statusBarNotification.getNotification().color);
     }
 
     @Override
@@ -112,59 +88,32 @@ public class BlurbNotificationService extends NotificationListenerService implem
         Log.d(TAG, "onListenerDisconnected: ");
     }
 
+    String classifyNotification(StatusBarNotification notification) {
+        String tag = notification.getTag();
+        if (tag == null || !tag.equals(posted_by_blurb)) { //Omit classifying notifications posted by blurb
+            String key = Util.getKey(notification);
+            if (!notification.isOngoing() && notification.getId() != Constants.BLURB_NOTIFICATION_ID && !activeNotifications.containsKey(key)) {
+                String pkgname = notification.getPackageName().replace('.', '-');
+                @Constants.CategoryDef String category = applist.getCategory(pkgname);
+                category = category == null ? Constants.CATEGORY_UNCATEGORIZED : category;
+                activeNotifications.addNotification(category, notification);
+                dismissNotification(notification);
+                if (category.equals(default_category)) {
+                    postNotification(notification);
+                }
+                return category;
+            }
+        }
+        return null;
+    }
+
     /**
-     * Push notifications from other categories to current category
+     * Transfer notifications from other categories to current category
      **/
     @Override
     public void notifyCategoryChanged(String pkgname, String category) {
-        Log.d(TAG, "notifyCategoryChanged: " + pkgname + " category " + category);
-        apps.put(pkgname, category);
-        switch (category) {
-            case App.CATEGORY_SOCIAL:
-                helper.transferNotifications(pkgname, social, rest, news, system);
-                break;
-            case App.CATEGORY_NEWS:
-                helper.transferNotifications(pkgname, news, social, rest, system);
-                break;
-            case App.CATEGORY_SYSTEM:
-                helper.transferNotifications(pkgname, system, social, news, rest);
-                break;
-            case App.CATEGORY_UNCATEGORIZED:
-            default:
-                helper.transferNotifications(pkgname, rest, social, news, system);
-                break;
-        }
-    }
-
-    @Override
-    public void onNotificationClassified(String category, StatusBarNotification notification) {
-
-        String key = BlurbHelper.getKey(notification);
-
-        Log.d(TAG, "onNotificationClassified: " + category + " key " + key);
-
-        silenceAndSetDeleteIntent(notification, key, category);
-
-        switch (category) {
-            case App.CATEGORY_NEWS:
-                news.put(key, notification);
-                break;
-            case App.CATEGORY_SOCIAL:
-                social.put(key, notification);
-                break;
-            case App.CATEGORY_SYSTEM:
-                system.put(key, notification);
-                break;
-            case App.CATEGORY_UNCATEGORIZED:
-                rest.put(key, notification);
-                break;
-            case App.CATEGORY_IMPORTANT:
-                break;
-            case App.CATEGORY_PROMOTIONS:
-                break;
-            default:
-                rest.put(key, notification);
-        }
+        applist.changeCateory(pkgname, category);
+        activeNotifications.changeCategory(pkgname, category);
     }
 
     /**
@@ -174,33 +123,22 @@ public class BlurbNotificationService extends NotificationListenerService implem
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int result = super.onStartCommand(intent, flags, startId);
-        int request = intent.getIntExtra(getString(R.string.intent_key), 0);
+
+        @Constants.RequestCode int request = intent.getIntExtra(Notifications.intent_request_key, 0);
+
         HashMap<String, StatusBarNotification> notifications = null;
 
-        if (request == App.REQUEST_DELETE_NOTIFICATION) {
-            String key = intent.getStringExtra(notification_key);
-            String category = intent.getStringExtra(category_key);
+        Log.d(TAG, "onStartCommand: " + request);
+
+        if (request == Constants.REQUEST_DELETE_NOTIFICATION) {
+            String key = intent.getStringExtra(Notifications.intent_notification_key);
+            String category = intent.getStringExtra(Notifications.intent_category_key);
             Log.d(TAG, "onStartCommand: delete notification " + category);
-            deleteNotification(category, key);
+            activeNotifications.removeNotification(category, key);
             return result;
         }
 
-        switch (request) {
-            case App.REQUEST_CODE_SOCIAL:
-                notifications = social;
-                break;
-            case App.REQUEST_CODE_NEWS:
-                notifications = news;
-                break;
-            case App.REQUEST_CODE_SYSTEM:
-                notifications = system;
-                break;
-            case App.REQUEST_CODE_MORE:
-                notifications = rest;
-                break;
-        }
-
-        Log.d(TAG, "onStartCommand: " + request);
+        notifications = activeNotifications.getMapByRequestCode(request);
 
         //On clicking category we post the notification with tweaks
         if (notifications != null) {
@@ -215,52 +153,6 @@ public class BlurbNotificationService extends NotificationListenerService implem
         return result;
     }
 
-    public String classifyNotification(StatusBarNotification statusBarNotification) {
-        if (!statusBarNotification.isOngoing() && statusBarNotification.getId() != App.BLURB_NOTIFICATION_ID) {
-
-            String key;
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH) {
-                key = App.getApi18Key(statusBarNotification.getId());
-            } else {
-                key = statusBarNotification.getKey();
-            }
-
-            if (!social.containsKey(key) && !news.containsKey(key) && !system.containsKey(key) && !rest.containsKey(key)) {
-                String pkgname = statusBarNotification.getPackageName().replace('.', '-');
-                String category = apps.get(pkgname);
-                category = category == null ? App.CATEGORY_UNCATEGORIZED : category;
-                onNotificationClassified(category, statusBarNotification);
-                return category;
-            }
-
-        }
-        return null;
-    }
-
-    public void deleteNotification(String category, String key) {
-        HashMap<String, StatusBarNotification> map = null;
-        Log.d(TAG, "deleteNotification: category " + category + " key " + key);
-        switch (category) {
-            case App.CATEGORY_SOCIAL:
-                map = social;
-                break;
-            case App.CATEGORY_NEWS:
-                map = news;
-                break;
-            case App.CATEGORY_SYSTEM:
-                map = system;
-                break;
-            case App.CATEGORY_UNCATEGORIZED:
-            case "":
-            default:
-                map = rest;
-                break;
-        }
-
-        if (map != null && map.containsKey(key)) {
-            map.remove(key);
-        }
-    }
 
     public void dismissAllNotifications() {
         cancelAllNotifications();
@@ -274,35 +166,9 @@ public class BlurbNotificationService extends NotificationListenerService implem
         }
     }
 
-    private void silenceAndSetDeleteIntent(StatusBarNotification notification, String key, String category) {
-        notification.getNotification().defaults = 0;    //Disables vibration
-        notification.getNotification().sound = null;    //Disables sound
-        notification.getNotification().deleteIntent = PendingIntent.getService(
-                this,
-                App.REQUEST_DELETE_NOTIFICATION,
-                new Intent(this, BlurbNotificationService.class)
-                        .putExtra(intent_key, App.REQUEST_DELETE_NOTIFICATION)
-                        .putExtra(notification_key, key)
-                        .putExtra(category_key, category),
-                PendingIntent.FLAG_UPDATE_CURRENT); //Set delete intent
-    }
-
     private void postNotification(StatusBarNotification notification) {
         notificationManager.notify(posted_by_blurb, notification.getId(), notification.getNotification());
     }
 
-    HashMap<String, StatusBarNotification> getMapByCategory(String category) {
-        switch (category) {
-            case App.CATEGORY_SOCIAL:
-                return social;
-            case App.CATEGORY_NEWS:
-                return news;
-            case App.CATEGORY_SYSTEM:
-                return system;
-            case App.CATEGORY_UNCATEGORIZED:
-            case "":
-                return rest;
-        }
-        return null;
-    }
+
 }

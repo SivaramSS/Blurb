@@ -1,4 +1,4 @@
-package com.flair.blurb;
+package com.flair.blurb.firebase;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

@@ -8,17 +8,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.preference.PreferenceManager;
-import android.service.notification.StatusBarNotification;
 import android.support.v7.app.NotificationCompat;
 import android.widget.RemoteViews;
 
+import com.flair.blurb.data.Notifications;
+import com.flair.blurb.firebase.AppCategoryChangeListener;
+import com.flair.blurb.firebase.DataChangeNotfier;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
@@ -27,9 +26,6 @@ import static android.content.Context.NOTIFICATION_SERVICE;
  * Created by sivaram-3911 on 07/01/17.
  */
 public class BlurbHelper {
-
-    public static final String TAG = BlurbOn.class.getSimpleName();
-    private static int idCounter = 0;
 
     private static BlurbHelper ourInstance = new BlurbHelper();
 
@@ -57,59 +53,30 @@ public class BlurbHelper {
             String pkgname = applicationInfo.packageName.replace('.', '-');
             String category = (applicationInfo.flags
                     & ApplicationInfo.FLAG_SYSTEM) != 0 ?
-                    App.CATEGORY_SYSTEM : App.CATEGORY_UNCATEGORIZED;
+                    Constants.CATEGORY_SYSTEM : Constants.CATEGORY_UNCATEGORIZED;
 
             writeNodeRef.child(pkgname).addValueEventListener(new AppCategoryChangeListener(writeNodeRef, pkgname, category, notifier));
         }
     }
 
-    public static int getId() {
-        return idCounter++;
-    }
-
-    public static String getKey(StatusBarNotification notification) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH) {
-            return App.getApi18Key(notification.getId());
-        } else {
-            return notification.getKey();
-        }
-    }
-
+    @Constants.CategoryDef
     public String defaultCategoryToShow(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(R.string.default_category_to_show_key), App.CATEGORY_SOCIAL);
-    }
-
-    synchronized void transferNotifications(String pkgname, HashMap<String, StatusBarNotification> mapToReceiveTransferredValues, HashMap<String, StatusBarNotification>... maps) {
-        HashMap<String, StatusBarNotification> receiver = mapToReceiveTransferredValues;
-
-        for (HashMap<String, StatusBarNotification> map : maps) {
-
-            Iterator<StatusBarNotification> iterator = map.values().iterator();
-            while (iterator.hasNext()) {
-                StatusBarNotification notification = iterator.next();
-                if (notification.getPackageName().replace('.', '-').equals(pkgname)) {
-                    String key = getKey(notification);
-                    receiver.put(key, notification);
-                    map.remove(key);
-                }
-            }
-
-        }
+        @Constants.CategoryDef String category = prefs.getString(context.getString(R.string.default_category_to_show_key), Constants.CATEGORY_SOCIAL);
+        return category;
     }
 
     void postBlurbNotification(Context context) {
         NotificationManager nm = ((NotificationManager) context.getSystemService(NOTIFICATION_SERVICE));
         RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.blurb_ongoing);
 
-        String intent_key = context.getString(R.string.intent_key);
         Intent socialIntent = new Intent();
-        socialIntent.putExtra(intent_key, App.REQUEST_CODE_SOCIAL);
+        socialIntent.putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_SOCIAL);
 
-        PendingIntent social = PendingIntent.getService(context, App.REQUEST_CODE_SOCIAL, new Intent(context, BlurbNotificationService.class).putExtra(intent_key, App.REQUEST_CODE_SOCIAL), PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent news = PendingIntent.getService(context, App.REQUEST_CODE_NEWS, new Intent(context, BlurbNotificationService.class).putExtra(intent_key, App.REQUEST_CODE_NEWS), PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent system = PendingIntent.getService(context, App.REQUEST_CODE_SYSTEM, new Intent(context, BlurbNotificationService.class).putExtra(intent_key, App.REQUEST_CODE_SYSTEM), PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent more = PendingIntent.getService(context, App.REQUEST_CODE_MORE, new Intent(context, BlurbNotificationService.class).putExtra(intent_key, App.REQUEST_CODE_MORE), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent social = PendingIntent.getService(context, Constants.REQUEST_CODE_SOCIAL, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_SOCIAL), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent news = PendingIntent.getService(context, Constants.REQUEST_CODE_NEWS, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_NEWS), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent system = PendingIntent.getService(context, Constants.REQUEST_CODE_SYSTEM, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_SYSTEM), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent more = PendingIntent.getService(context, Constants.REQUEST_CODE_MORE, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_MORE), PendingIntent.FLAG_UPDATE_CURRENT);
 
         contentView.setOnClickPendingIntent(R.id.social, social);
         contentView.setOnClickPendingIntent(R.id.news, news);
@@ -123,7 +90,7 @@ public class BlurbHelper {
                 .setOngoing(true)
                 .build();
 
-        nm.notify(App.BLURB_NOTIFICATION_ID, notification);
+        nm.notify(Constants.BLURB_NOTIFICATION_ID, notification);
     }
 
 }

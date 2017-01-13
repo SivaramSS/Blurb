@@ -2,7 +2,7 @@
     <string name="app_name">blurb</string>
     <string name="root_node_key">applications</string>
     <string name="write_node_key">writeNode</string>
-    <string name="intent_key">intent_key</string>
+    <string name="intent_request_key">intent_request_key</string>
     <string name="notification_key">notification_key</string>
     <string name="category_key">category_key</string>
     <string name="posted_by_blurb">!258fYfl10@5</string>
