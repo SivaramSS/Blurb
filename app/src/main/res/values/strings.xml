@@ -6,4 +6,5 @@
     <string name="notification_key">notification_key</string>
     <string name="category_key">category_key</string>
     <string name="posted_by_blurb">!258fYfl10@5</string>
+    <string name="default_category_to_show_key">default_category_to_show</string>
 </resources>

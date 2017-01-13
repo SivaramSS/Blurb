@@ -5,9 +5,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.service.notification.StatusBarNotification;
 import android.support.v7.app.NotificationCompat;
 import android.widget.RemoteViews;
@@ -42,23 +44,7 @@ public class BlurbHelper {
      * Called when the service starts for the first time.
      * It classifies the installed apps into categories.
      */
-    public void instantiateBlurb(Context context, DataChangeNotfier notifier) {
-        classifyInstalledApps(context, notifier);
-    }
-
-    public static int getId() {
-        return idCounter++;
-    }
-
-    public static String getKey(StatusBarNotification notification) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH) {
-            return App.getApi18Key(notification.getId());
-        } else {
-            return notification.getKey();
-        }
-    }
-
-    private void classifyInstalledApps(Context context, DataChangeNotfier notifier) {
+    public void categorizeInstalledApps(Context context, DataChangeNotfier notifier) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 //        firebaseDatabase.setPersistenceEnabled(false);
         final DatabaseReference writeNodeRef = firebaseDatabase.getReference(context.getString(R.string.root_node_key)).child(context.getString(R.string.write_node_key));
@@ -77,6 +63,22 @@ public class BlurbHelper {
         }
     }
 
+    public static int getId() {
+        return idCounter++;
+    }
+
+    public static String getKey(StatusBarNotification notification) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH) {
+            return App.getApi18Key(notification.getId());
+        } else {
+            return notification.getKey();
+        }
+    }
+
+    public String defaultCategoryToShow(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(context.getString(R.string.default_category_to_show_key), App.CATEGORY_SOCIAL);
+    }
 
     synchronized void transferNotifications(String pkgname, HashMap<String, StatusBarNotification> mapToReceiveTransferredValues, HashMap<String, StatusBarNotification>... maps) {
         HashMap<String, StatusBarNotification> receiver = mapToReceiveTransferredValues;
@@ -123,4 +125,5 @@ public class BlurbHelper {
 
         nm.notify(App.BLURB_NOTIFICATION_ID, notification);
     }
+
 }
