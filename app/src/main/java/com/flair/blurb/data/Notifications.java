@@ -13,7 +13,6 @@ import java.util.Iterator;
 
 import static com.flair.blurb.Util.addNotificationExtras;
 import static com.flair.blurb.Util.getKey;
-import static com.flair.blurb.Util.mergeNotifications;
 
 /**
  * Created by sivaram-3911 on 13/01/17.
@@ -55,7 +54,7 @@ public class Notifications {
 
         addNotificationExtras(context, notification, category, key);
 
-        mergeNotifications(map, notification);
+//        mergeNotifications(map, notification);
 
         map.put(key, notification);
     }
