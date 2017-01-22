@@ -9,9 +9,9 @@
     <LinearLayout
         android:id="@+id/social"
         android:layout_width="0dp"
-        android:layout_height="@dimen/icon_container_dimension"
-        android:layout_gravity="center_vertical"
+        android:layout_height="match_parent"
         android:layout_weight="1"
+        android:gravity="center"
         android:background="?android:attr/selectableItemBackground"
         android:orientation="vertical">
 
@@ -25,19 +25,21 @@
             android:id="@+id/social_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="2dp"
-            android:textColor="@android:color/black"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/hint_text"
+            android:textSize="@dimen/text_size" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/news"
         android:layout_width="0dp"
-        android:layout_height="@dimen/icon_container_dimension"
-        android:layout_gravity="center_vertical"
+        android:layout_height="match_parent"
         android:layout_weight="1"
+        android:gravity="center"
         android:background="?android:attr/selectableItemBackground"
         android:orientation="vertical">
 
@@ -51,19 +53,21 @@
             android:id="@+id/news_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="2dp"
-            android:textColor="@android:color/black"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/hint_text"
+            android:textSize="@dimen/text_size" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/system"
         android:layout_width="0dp"
-        android:layout_height="@dimen/icon_container_dimension"
-        android:layout_gravity="center_vertical"
+        android:layout_height="match_parent"
         android:layout_weight="1"
+        android:gravity="center"
         android:background="?android:attr/selectableItemBackground"
         android:orientation="vertical">
 
@@ -77,19 +81,21 @@
             android:id="@+id/system_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="2dp"
-            android:textColor="@android:color/black"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/hint_text"
+            android:textSize="@dimen/text_size" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/more"
         android:layout_width="0dp"
-        android:layout_height="@dimen/icon_container_dimension"
-        android:layout_gravity="center_vertical"
+        android:layout_height="match_parent"
         android:layout_weight="1"
+        android:gravity="center"
         android:background="?android:attr/selectableItemBackground"
         android:orientation="vertical">
 
@@ -103,10 +109,12 @@
             android:id="@+id/rest_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="2dp"
-            android:textColor="@android:color/black"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/hint_text"
+            android:textSize="@dimen/text_size" />
 
     </LinearLayout>
 

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/stats_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    app:behavior_peekHeight="@dimen/blurb_notification_stats_peek_height"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+    <FrameLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/blurb_notification_stats_peek_height"
+        android:background="@color/colorPrimary"
+        android:elevation="@dimen/bottom_sheet_header_elevation">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/toolbar_title_margin_start"
+            android:fontFamily="sans-serif"
+            android:text="@string/bottom_sheet_header_label"
+            android:textAllCaps="true"
+            android:textSize="@dimen/bottom_sheet_header_label_text_size" />
+
+    </FrameLayout>
+
+    <ImageView
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_blurb_activate" />
+
+</LinearLayout>

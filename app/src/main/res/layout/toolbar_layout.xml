@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="?attr/colorPrimary"
+    android:clickable="true"
+    android:focusable="true"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text="@string/app_name"
+        android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+        android:textColor="@android:color/white" />
+
+    <FrameLayout
+        android:id="@+id/stats_container"
+        android:layout_width="@dimen/toolbar_icon_container_dimension"
+        android:layout_height="@dimen/toolbar_icon_container_dimension"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:layout_marginEnd="@dimen/toolbar_icon_spacing"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/share_container">
+
+        <ImageView
+            android:layout_width="@dimen/toolbar_icon_dimension"
+            android:layout_height="@dimen/toolbar_icon_dimension"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_stats" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/share_container"
+        android:layout_width="@dimen/toolbar_icon_container_dimension"
+        android:layout_height="@dimen/toolbar_icon_container_dimension"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:paddingStart="0dp"
+        android:paddingEnd="@dimen/toolbar_last_icon_padding_end"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true">
+
+        <ImageView
+            android:layout_width="@dimen/toolbar_icon_dimension"
+            android:layout_height="@dimen/toolbar_icon_dimension"
+            android:layout_gravity="center_vertical|end"
+            android:src="@drawable/ic_share" />
+
+    </FrameLayout>
+
+</RelativeLayout>
+

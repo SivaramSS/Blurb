@@ -8,4 +8,9 @@
     <string name="posted_by_blurb">!258fYfl10@5</string>
     <string name="default_category_to_show_key">default_category_to_show</string>
     <string name="package_key">package_key</string>
+    <string name="dismiss_action_label">Dismiss</string>
+    <string name="do_not_disturb_action_label">DND</string>
+    <string name="action_label_share">SHARE</string>
+    <string name="action_label_stats">STATS</string>
+    <string name="bottom_sheet_header_label">NOTIFICATION STATS</string>
 </resources>

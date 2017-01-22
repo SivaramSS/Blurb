@@ -1,6 +1,5 @@
 package com.flair.blurb;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -8,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.v7.app.NotificationCompat;
 import android.widget.RemoteViews;
@@ -86,10 +86,15 @@ public class BlurbHelper {
         contentView.setTextViewText(R.id.system_count, 0 + "");
         contentView.setTextViewText(R.id.rest_count, 0 + "");
 
+        PendingIntent dismiss = PendingIntent.getService(context, Constants.REQUEST_STOP_BLURB, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_STOP_BLURB), PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+
         builder.setSmallIcon(R.mipmap.ic_launcher)
                 .setContent(contentView)
-                .setPriority(Notification.PRIORITY_MIN)
+//                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+//                .addAction(R.drawable.ic_dismiss, context.getString(R.string.dismiss_action_label), dismiss)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setColor(Color.parseColor("#3F2B4F"))
                 .setOngoing(true);
 
         nm.notify(Constants.BLURB_NOTIFICATION_ID, builder.build());

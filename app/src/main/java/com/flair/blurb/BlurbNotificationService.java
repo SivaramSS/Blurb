@@ -192,6 +192,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
                 StatusBarNotification notification = iter.next();
                 postNotification(notification.getPackageName(), notification);
             }
+            refreshCount();
         }
 
         return result;
@@ -216,16 +217,18 @@ public class BlurbNotificationService extends NotificationListenerService implem
     }
 
     public void refreshCount() {
-//        int size = activeNotifications.size();
-//        if(size == 1) {
-//            blurbNotificationBuilder.setTicker("1 Notification");
-//        } else if(size > 1) {
-//            blurbNotificationBuilder.setTicker(size + " Notifications");
-//        }
-        contentView.setTextViewText(R.id.social_count, activeNotifications.getMapSizeByCategory(Constants.CATEGORY_SOCIAL)+"");
-        contentView.setTextViewText(R.id.news_count, activeNotifications.getMapSizeByCategory(Constants.CATEGORY_NEWS)+"");
-        contentView.setTextViewText(R.id.system_count, activeNotifications.getMapSizeByCategory(Constants.CATEGORY_SYSTEM)+"");
-        contentView.setTextViewText(R.id.rest_count, activeNotifications.getMapSizeByCategory(Constants.CATEGORY_UNCATEGORIZED)+"");
+        int size = activeNotifications.size();
+        if(size == 1) {
+            blurbNotificationBuilder.setTicker("1 Notification");
+        } else if(size > 1) {
+            blurbNotificationBuilder.setTicker(size + " Notifications");
+        }
+
+        contentView.setTextViewText(R.id.social_count, activeNotifications.getSocialCount());
+        contentView.setTextViewText(R.id.news_count, activeNotifications.getNewsCount());
+        contentView.setTextViewText(R.id.system_count, activeNotifications.getSystemCount());
+        contentView.setTextViewText(R.id.rest_count, activeNotifications.getRestCount());
+
         blurbNotificationBuilder.setContent(contentView);
         notificationManager.notify(Constants.BLURB_NOTIFICATION_ID, blurbNotificationBuilder.build());
     }

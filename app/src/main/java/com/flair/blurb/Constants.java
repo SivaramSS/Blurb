@@ -32,4 +32,5 @@ public class Constants {
     public static final int REQUEST_CODE_SYSTEM = 3333;
     public static final int REQUEST_CODE_MORE = 4444;
     public static final int REQUEST_DELETE_NOTIFICATION = 7777;
+    public static final int REQUEST_STOP_BLURB = 8888;
 }

@@ -26,7 +26,8 @@ public class Notifications {
     HashMap<String, StatusBarNotification> important, social, system, promotions, news, rest;
     HashMap<String, String> apps;
 
-    private Notifications() {}
+    private Notifications() {
+    }
 
     public Notifications(Context context) {
         this.context = context;
@@ -48,7 +49,7 @@ public class Notifications {
 
         String key = getKey(notification);
 
-        Log.d(TAG, "addNotification: "+category+" key "+key);
+        Log.d(TAG, "addNotification: " + category + " key " + key);
 
         HashMap<String, StatusBarNotification> map = getMapByCategory(category);
 
@@ -61,8 +62,8 @@ public class Notifications {
 
     public void removeNotification(String category, String key) {
         HashMap<String, StatusBarNotification> map;
-        if(category == null) {
-            map = social.containsKey(key)? social : (news.containsKey(key)? news : (system.containsKey(key)? system : rest));
+        if (category == null) {
+            map = social.containsKey(key) ? social : (news.containsKey(key) ? news : (system.containsKey(key) ? system : rest));
         } else {
             map = getMapByCategory(category);
         }
@@ -150,20 +151,22 @@ public class Notifications {
         return null;
     }
 
-    public int getMapSizeByCategory(@Constants.CategoryDef String category) {
-        switch (category) {
-            case Constants.CATEGORY_SOCIAL:
-                return social.size();
-            case Constants.CATEGORY_NEWS:
-                return news.size();
-            case Constants.CATEGORY_SYSTEM:
-                return system.size();
-            case Constants.CATEGORY_UNCATEGORIZED:
-            case "":
-                return rest.size();
-        }
-        return 0;
+    public String getSocialCount() {
+        return social.size() > 0 ? String.valueOf(social.size()) : "SOCIAL";
     }
+
+    public String getNewsCount() {
+        return news.size() > 0 ? String.valueOf(news.size()) : "NEWS";
+    }
+
+    public String getSystemCount() {
+        return system.size() > 0 ? String.valueOf(system.size()) : "SYSTEM";
+    }
+
+    public String getRestCount() {
+        return rest.size() > 0 ? String.valueOf(rest.size()) : "REST";
+    }
+
 
     public int size() {
         return social.size() + news.size() + system.size() + rest.size();
