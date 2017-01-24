@@ -19,7 +19,7 @@
         android:textColor="@android:color/white" />
 
     <FrameLayout
-        android:id="@+id/stats_container"
+        android:id="@+id/upcoming_features"
         android:layout_width="@dimen/toolbar_icon_container_dimension"
         android:layout_height="@dimen/toolbar_icon_container_dimension"
         android:background="?android:attr/selectableItemBackgroundBorderless"
@@ -31,7 +31,7 @@
             android:layout_width="@dimen/toolbar_icon_dimension"
             android:layout_height="@dimen/toolbar_icon_dimension"
             android:layout_gravity="center"
-            android:src="@drawable/ic_stats" />
+            android:src="@drawable/ic_announcement" />
 
     </FrameLayout>
 

@@ -2,6 +2,7 @@ package com.flair.blurb;
 
 import android.app.ActivityManager;
 import android.app.NotificationManager;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Build;
 import android.service.notification.NotificationListenerService;
@@ -12,8 +13,11 @@ import android.widget.RemoteViews;
 
 import com.flair.blurb.data.Apps;
 import com.flair.blurb.data.Notifications;
+import com.flair.blurb.db.StatsContract;
 import com.flair.blurb.firebase.DataChangeNotfier;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -85,7 +89,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
 
     @Override
     public void onNotificationPosted(StatusBarNotification statusBarNotification) {
-        Log.d(TAG, "onNotificationPosted: "+Util.getKey(statusBarNotification));
+        Log.d(TAG, "onNotificationPosted: " + Util.getKey(statusBarNotification));
         classifyNotification(statusBarNotification);
     }
 
@@ -125,6 +129,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
                 @Constants.CategoryDef String category = applist.getCategory(pkgname);
                 category = category == null ? Constants.CATEGORY_UNCATEGORIZED : category;
                 activeNotifications.addNotification(category, notification);
+                insertIntoDb(notification, category);
                 dismissNotification(notification);
                 if (category.equals(default_category)) {
                     postNotification(notification.getPackageName(), notification);
@@ -154,6 +159,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
                     StatusBarNotification notification = iterator.next();
                     Util.addNotificationExtras(this, notification, category, Util.getKey(notification));
                     postNotification(notification.getPackageName(), notification);
+                    updateDb(notification, category);
                 }
             }
         }
@@ -212,15 +218,15 @@ public class BlurbNotificationService extends NotificationListenerService implem
     }
 
     private void postNotification(String origpkgname, StatusBarNotification notification) {
-        Log.d(TAG, "postNotification: notification id "+notification.getId());
+        Log.d(TAG, "postNotification: notification id " + notification.getId());
         notificationManager.notify(origpkgname, notification.getId(), notification.getNotification());
     }
 
     public void refreshCount() {
         int size = activeNotifications.size();
-        if(size == 1) {
+        if (size == 1) {
             blurbNotificationBuilder.setTicker("1 Notification");
-        } else if(size > 1) {
+        } else if (size > 1) {
             blurbNotificationBuilder.setTicker(size + " Notifications");
         }
 
@@ -231,5 +237,21 @@ public class BlurbNotificationService extends NotificationListenerService implem
 
         blurbNotificationBuilder.setContent(contentView);
         notificationManager.notify(Constants.BLURB_NOTIFICATION_ID, blurbNotificationBuilder.build());
+    }
+
+    private void insertIntoDb(StatusBarNotification notification, String category) {
+        ContentValues values = new ContentValues();
+        values.put(StatsContract.StatsEntry.COLUMN_KEY, Util.getKey(notification));
+        values.put(StatsContract.StatsEntry.COLUMN_CATEGORY, category);
+        values.put(StatsContract.StatsEntry.COLUMN_TIMESTAMP, SimpleDateFormat.getDateTimeInstance().format(new Date()));
+        getContentResolver().insert(StatsContract.StatsEntry.CONTENT_URI, values);
+    }
+
+    private void updateDb(StatusBarNotification notification, String category) {
+        ContentValues values = new ContentValues();
+        values.put(StatsContract.StatsEntry.COLUMN_KEY, Util.getKey(notification));
+        values.put(StatsContract.StatsEntry.COLUMN_CATEGORY, category);
+        values.put(StatsContract.StatsEntry.COLUMN_TIMESTAMP, SimpleDateFormat.getDateTimeInstance().format(new Date()));
+        getContentResolver().update(StatsContract.StatsEntry.CONTENT_URI, values, StatsContract.StatsEntry.COLUMN_KEY + "=?", new String[]{Util.getKey(notification)});
     }
 }

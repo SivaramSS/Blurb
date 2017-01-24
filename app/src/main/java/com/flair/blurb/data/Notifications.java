@@ -89,7 +89,7 @@ public class Notifications {
         return null;
     }
 
-    public void changeCategory(String pkgname, @Constants.CategoryDef String category) {
+    synchronized public void changeCategory(String pkgname, @Constants.CategoryDef String category) {
 
         HashMap<String, StatusBarNotification> receiver;
         ArrayList<HashMap<String, StatusBarNotification>> maps = new ArrayList<>();
@@ -130,7 +130,7 @@ public class Notifications {
                 if (notification.getPackageName().replace('.', '-').equals(pkgname)) {
                     String key = getKey(notification);
                     receiver.put(key, notification);
-                    map.remove(key);
+                    iterator.remove();
                 }
             }
 

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/upcoming_features_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@+id/appbar"
+    android:background="@android:color/white"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        android:elevation="@dimen/header_elevation">
+
+        <FrameLayout
+            android:id="@+id/back_upcoming_features"
+            android:layout_width="@dimen/icon_container_dimension"
+            android:layout_height="@dimen/icon_container_dimension"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:layout_width="@dimen/icon_dimension"
+                android:layout_height="@dimen/icon_dimension"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_back" />
+
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/upcoming_features_header_margin_start"
+            android:text="@string/upcoming_features_label"
+            android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
+
+    </LinearLayout>
+
+</LinearLayout>

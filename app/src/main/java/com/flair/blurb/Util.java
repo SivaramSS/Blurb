@@ -4,9 +4,9 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
+import android.view.View;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,11 +23,12 @@ public class Util {
     private static final String TAG = Util.class.getSimpleName();
 
     public static String getKey(StatusBarNotification notification) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH) {
-            return notification.getId() + "_" + System.currentTimeMillis();
-        } else {
-            return notification.getKey();
-        }
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH) {
+//            return notification.getId() + "_" + System.currentTimeMillis();
+//        } else {
+//            return notification.getKey();
+//        }
+        return notification.getKey();
     }
 
     public static String getCategoryForRequestcode(@Constants.RequestCode int request) {
@@ -76,5 +77,9 @@ public class Util {
                 }
             }
         }
+    }
+
+    public static int[] getCenterCoordsOfView(View view) {
+        return new int[]{view.getLeft() + view.getWidth() / 2, view.getTop() + view.getHeight() / 2};
     }
 }

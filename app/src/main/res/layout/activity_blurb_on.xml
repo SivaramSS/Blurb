@@ -5,9 +5,10 @@
     android:id="@+id/activity_blurb_on"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.flair.blurb.BlurbOn">
+    tools:context="com.flair.blurb.ui.BlurbOn">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:elevation="0dp">
@@ -39,5 +40,8 @@
         android:layout_marginEnd="@dimen/fab_margin_end"
         android:layout_marginBottom="@dimen/fab_margin_bottom"
         android:src="@drawable/ic_stats" />
+
+    <include layout="@layout/upcoming_features_layout"
+        android:visibility="invisible" />
 
 </android.support.design.widget.CoordinatorLayout>

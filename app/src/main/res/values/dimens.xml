@@ -19,10 +19,11 @@
     <dimen name="blurb_icon_b_elevation">4dp</dimen>
     <dimen name="blurb_icon_bell_elevation">2dp</dimen>
 
-    <dimen name="blurb_notification_stats_peek_height">48dp</dimen>
-    <dimen name="bottom_sheet_header_label_text_size">18sp</dimen>
-    <dimen name="bottom_sheet_header_elevation">4dp</dimen>
+    <dimen name="header_elevation">4dp</dimen>
 
     <dimen name="fab_margin_end">16dp</dimen>
     <dimen name="fab_margin_bottom">16dp</dimen>
+    <dimen name="back_icon_margin_start">16dp</dimen>
+    <dimen name="upcoming_features_header_margin_start">16dp</dimen>
+
 </resources>

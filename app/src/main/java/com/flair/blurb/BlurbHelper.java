@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.v7.app.NotificationCompat;
 import android.widget.RemoteViews;
@@ -94,7 +93,6 @@ public class BlurbHelper {
 //                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
 //                .addAction(R.drawable.ic_dismiss, context.getString(R.string.dismiss_action_label), dismiss)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setColor(Color.parseColor("#3F2B4F"))
                 .setOngoing(true);
 
         nm.notify(Constants.BLURB_NOTIFICATION_ID, builder.build());

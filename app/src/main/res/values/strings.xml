@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">blurb</string>
+    <string name="app_name">Blurb</string>
     <string name="root_node_key">applications</string>
     <string name="write_node_key">writeNode</string>
     <string name="intent_request_key">intent_request_key</string>
@@ -12,5 +12,6 @@
     <string name="do_not_disturb_action_label">DND</string>
     <string name="action_label_share">SHARE</string>
     <string name="action_label_stats">STATS</string>
-    <string name="bottom_sheet_header_label">NOTIFICATION STATS</string>
+    <string name="bottom_sheet_header_label">Notification Stats</string>
+    <string name="upcoming_features_label">Upcoming Features</string>
 </resources>
