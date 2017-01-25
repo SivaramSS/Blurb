@@ -3,6 +3,7 @@ package com.flair.blurb.ui;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -31,14 +32,27 @@ public class DisplayStats {
     ProgressBar progressBar;
     int barColor;
     int totalcount = 0, steps;
+    View back;
 
-    public DisplayStats(Context context, View statsLayout) {
+    public DisplayStats(final Context context, View statsLayout) {
         this.context = context;
         this.statsLayout = statsLayout;
         this.chart = ((ChartView) statsLayout.findViewById(R.id.chart));
         this.progressBar = ((ProgressBar) statsLayout.findViewById(R.id.progress_bar));
         this.barColor = ContextCompat.getColor(context, R.color.green);
         this.summary = ((TextView) statsLayout.findViewById(R.id.summary));
+        back = statsLayout.findViewById(R.id.back_notifcaion_stats);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((BlurbOn) context).behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
+        statsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
     }
 
     public void loadStats(Cursor data) {
@@ -83,7 +97,7 @@ public class DisplayStats {
             while (data.moveToNext()) {
                 Log.d(TAG, "doInBackground: " + data.getString(0) + " " + data.getInt(1));
                 Bar bar = new Bar(data.getString(0), data.getInt(1));
-                totalcount+= data.getInt(1);
+                totalcount += data.getInt(1);
                 dataset.addBar(bar);
             }
             steps = totalcount / 4;
@@ -94,7 +108,7 @@ public class DisplayStats {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if(totalcount == 0) {
+            if (totalcount == 0) {
                 ((ViewGroup) chart.getParent()).setVisibility(View.GONE);
             } else {
                 ((ViewGroup) chart.getParent()).setVisibility(View.VISIBLE);

@@ -25,8 +25,9 @@
             android:id="@+id/blurb_activator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/blurb_activate_description"
             android:layout_gravity="center"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:background="?android:attr/selectableItemBackground"
             android:elevation="@dimen/blurb_icon_bg_elevation">
 
             <ImageView

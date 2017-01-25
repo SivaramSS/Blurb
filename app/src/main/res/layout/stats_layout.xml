@@ -9,12 +9,31 @@
     app:behavior_peekHeight="?attr/actionBarSize"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:animateLayoutChanges="true"
         android:background="@color/colorPrimary"
-        android:elevation="@dimen/header_elevation">
+        android:contentDescription="@string/bottom_sheet_header_label"
+        android:elevation="@dimen/header_elevation"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/back_notifcaion_stats"
+            android:layout_width="@dimen/icon_container_dimension"
+            android:layout_height="@dimen/icon_container_dimension"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="@dimen/icon_dimension"
+                android:layout_height="@dimen/icon_dimension"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_back" />
+
+        </FrameLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -24,7 +43,7 @@
             android:text="@string/bottom_sheet_header_label"
             android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
 
-    </FrameLayout>
+    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"

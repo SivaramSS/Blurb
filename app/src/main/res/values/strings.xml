@@ -11,7 +11,6 @@
     <string name="dismiss_action_label">Dismiss</string>
     <string name="do_not_disturb_action_label">DND</string>
     <string name="action_label_share">SHARE</string>
-    <string name="action_label_stats">STATS</string>
     <string name="bottom_sheet_header_label">Notification Stats</string>
     <string name="upcoming_features_label">Upcoming Features</string>
     <string name="widget_id_key">widget_id_key</string>
@@ -20,4 +19,6 @@
     <string name="blurb_stopped">Blurb has been stopped from running</string>
     <string name="blurb_notification_access_request">Blurb requires your permission to access notifcations</string>
     <string name="notification_access_enabled_key">fdgshghjlkjk</string>
+
+    <string name="blurb_activate_description">Activate Blurb</string>
 </resources>

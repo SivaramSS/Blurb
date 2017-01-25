@@ -22,6 +22,7 @@
         android:id="@+id/upcoming_features"
         android:layout_width="@dimen/toolbar_icon_container_dimension"
         android:layout_height="@dimen/toolbar_icon_container_dimension"
+        android:contentDescription="@string/upcoming_features_label"
         android:background="?android:attr/selectableItemBackgroundBorderless"
         android:layout_marginEnd="@dimen/toolbar_icon_spacing"
         android:layout_centerVertical="true"
@@ -30,6 +31,7 @@
         <ImageView
             android:layout_width="@dimen/toolbar_icon_dimension"
             android:layout_height="@dimen/toolbar_icon_dimension"
+            android:contentDescription="@string/upcoming_features_label"
             android:layout_gravity="center"
             android:src="@drawable/ic_announcement" />
 
@@ -40,6 +42,7 @@
         android:layout_width="@dimen/toolbar_icon_container_dimension"
         android:layout_height="@dimen/toolbar_icon_container_dimension"
         android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_label_share"
         android:paddingStart="0dp"
         android:paddingEnd="@dimen/toolbar_last_icon_padding_end"
         android:layout_alignParentEnd="true"
@@ -48,6 +51,7 @@
         <ImageView
             android:layout_width="@dimen/toolbar_icon_dimension"
             android:layout_height="@dimen/toolbar_icon_dimension"
+            android:contentDescription="@string/action_label_share"
             android:layout_gravity="center_vertical|end"
             android:src="@drawable/ic_share" />
 
