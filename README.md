@@ -6,12 +6,12 @@ Blurb is an Android application that filters push notifications into several cat
 
 - Classifying notifications into different categories.
 - Firebase integration to load app-category data.
+- Do not disturb mode.
 
 ##Featues yet to be completed
 
 - A statistics and timeline of frequency of notifications received.
 - Share app functionality.
-- Do not disturb mode.
 - Option to dismiss the service from ongoing notification.
 - Spam category that filters promotional notifications pushed by app.
 
