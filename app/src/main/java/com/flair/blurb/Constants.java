@@ -25,7 +25,7 @@ public class Constants {
     public static final String CATEGORY_PROMOTIONS = "PROMOTIONS";
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({REQUEST_CODE_MORE, REQUEST_CODE_NEWS, REQUEST_CODE_SOCIAL, REQUEST_CODE_SYSTEM, REQUEST_DELETE_NOTIFICATION})
+    @IntDef({REQUEST_CODE_MORE, REQUEST_CODE_NEWS, REQUEST_CODE_SOCIAL, REQUEST_CODE_SYSTEM, REQUEST_DELETE_NOTIFICATION, REQUEST_CODE_WIDGET})
     public @interface RequestCode{}
     public static final int REQUEST_CODE_SOCIAL = 1111;
     public static final int REQUEST_CODE_NEWS = 2222;
@@ -33,4 +33,6 @@ public class Constants {
     public static final int REQUEST_CODE_MORE = 4444;
     public static final int REQUEST_DELETE_NOTIFICATION = 7777;
     public static final int REQUEST_STOP_BLURB = 8888;
+
+    public static final int REQUEST_CODE_WIDGET = 262626;
 }

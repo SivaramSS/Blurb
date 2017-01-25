@@ -26,4 +26,5 @@
     <dimen name="back_icon_margin_start">16dp</dimen>
     <dimen name="upcoming_features_header_margin_start">16dp</dimen>
 
+    <dimen name="widget_dimension">40dp</dimen>
 </resources>

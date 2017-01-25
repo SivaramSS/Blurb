@@ -14,4 +14,5 @@
     <string name="action_label_stats">STATS</string>
     <string name="bottom_sheet_header_label">Notification Stats</string>
     <string name="upcoming_features_label">Upcoming Features</string>
+    <string name="widget_id_key">widget_id_key</string>
 </resources>

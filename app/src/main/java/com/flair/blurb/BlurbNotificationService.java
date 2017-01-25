@@ -2,6 +2,8 @@ package com.flair.blurb;
 
 import android.app.ActivityManager;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Build;
@@ -18,8 +20,8 @@ import com.flair.blurb.firebase.DataChangeNotfier;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by sivaram-3911 on 24/12/16.
@@ -33,8 +35,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
      */
     BlurbHelper helper;
 
-    int nCounter;
-    boolean dnd;
+    boolean notificationsOn = true;
     String posted_by_blurb;
     @Constants.CategoryDef
     String default_category;
@@ -50,8 +51,6 @@ public class BlurbNotificationService extends NotificationListenerService implem
     public BlurbNotificationService() {
         super();
         helper = BlurbHelper.getInstance();
-        this.nCounter = 0;
-        this.dnd = false;
     }
 
     /**
@@ -152,7 +151,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
         //Refresh active notifications
         if (category.equals(Util.getCategoryForRequestcode(selected_category))) {
             dismissAllNotifications();
-            HashMap<String, StatusBarNotification> notifications = activeNotifications.getMapByRequestCode(selected_category);
+            ConcurrentHashMap<String, StatusBarNotification> notifications = activeNotifications.getMapByRequestCode(selected_category);
             if (notifications != null) {
                 Iterator<StatusBarNotification> iterator = notifications.values().iterator();
                 while (iterator.hasNext()) {
@@ -175,7 +174,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
 
         @Constants.RequestCode int request = intent.getIntExtra(Notifications.intent_request_key, 0);
 
-        HashMap<String, StatusBarNotification> notifications = null;
+        ConcurrentHashMap<String, StatusBarNotification> notifications = null;
 
         Log.d(TAG, "onStartCommand: " + request);
 
@@ -186,6 +185,14 @@ public class BlurbNotificationService extends NotificationListenerService implem
             activeNotifications.removeNotification(category, key);
             refreshCount();
             return result;
+        }
+
+        if(request == Constants.REQUEST_CODE_WIDGET) {
+            notificationsOn = !notificationsOn;
+//            requestInterruptionFilter();
+            int[] appWidgetIds = intent.getIntArrayExtra(getString(R.string.widget_id_key));
+            updateWidgets(appWidgetIds);
+            requestListenerHints(notificationsOn? 0 : NotificationListenerService.HINT_HOST_DISABLE_EFFECTS);
         }
 
         notifications = activeNotifications.getMapByRequestCode(request);
@@ -253,5 +260,16 @@ public class BlurbNotificationService extends NotificationListenerService implem
         values.put(StatsContract.StatsEntry.COLUMN_CATEGORY, category);
         values.put(StatsContract.StatsEntry.COLUMN_TIMESTAMP, SimpleDateFormat.getDateTimeInstance().format(new Date()));
         getContentResolver().update(StatsContract.StatsEntry.CONTENT_URI, values, StatsContract.StatsEntry.COLUMN_KEY + "=?", new String[]{Util.getKey(notification)});
+    }
+
+    private void updateWidgets(int[] ids) {
+        AppWidgetManager manager = AppWidgetManager.getInstance(this);
+        PendingIntent pendingIntent = PendingIntent.getService(this, Constants.REQUEST_CODE_WIDGET, new Intent(this, BlurbNotificationService.class)
+                .putExtra(getString(R.string.intent_request_key), Constants.REQUEST_CODE_WIDGET)
+                .putExtra(getString(R.string.widget_id_key), ids), PendingIntent.FLAG_UPDATE_CURRENT);
+        RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.widget_layout);
+        remoteViews.setImageViewResource(R.id.button_dnd, notificationsOn? R.drawable.ic_notifications_on : R.drawable.ic_notifications_off);
+        remoteViews.setOnClickPendingIntent(R.id.button_dnd, pendingIntent);
+        manager.updateAppWidget(ids, remoteViews);
     }
 }

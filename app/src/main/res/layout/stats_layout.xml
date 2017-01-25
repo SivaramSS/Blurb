@@ -31,6 +31,6 @@
         android:layout_height="160dp"
         android:layout_marginTop="200dp"
         android:layout_gravity="center"
-        android:src="@drawable/ic_blurb_activate" />
+        android:src="@drawable/ic_notifications_off" />
 
 </LinearLayout>

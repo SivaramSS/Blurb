@@ -22,5 +22,6 @@ public class DisplayStats {
 
     public void loadStats(Cursor data) {
         Log.d(TAG, "loadStats: "+data.getCount());
+
     }
 }

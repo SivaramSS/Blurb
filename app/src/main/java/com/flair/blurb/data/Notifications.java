@@ -8,8 +8,8 @@ import com.flair.blurb.Constants;
 import com.flair.blurb.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.flair.blurb.Util.addNotificationExtras;
 import static com.flair.blurb.Util.getKey;
@@ -23,19 +23,19 @@ public class Notifications {
     private static final String TAG = Notifications.class.getSimpleName();
     Context context;
     public static String intent_request_key, intent_category_key, intent_notification_key;
-    HashMap<String, StatusBarNotification> important, social, system, promotions, news, rest;
-    HashMap<String, String> apps;
+    ConcurrentHashMap<String, StatusBarNotification> important, social, system, promotions, news, rest;
+    ConcurrentHashMap<String, String> apps;
 
     private Notifications() {
     }
 
     public Notifications(Context context) {
         this.context = context;
-        apps = new HashMap<>();
-        social = new HashMap<>();
-        system = new HashMap<>();
-        news = new HashMap<>();
-        rest = new HashMap<>();
+        apps = new ConcurrentHashMap<>();
+        social = new ConcurrentHashMap<>();
+        system = new ConcurrentHashMap<>();
+        news = new ConcurrentHashMap<>();
+        rest = new ConcurrentHashMap<>();
         intent_request_key = context.getString(R.string.intent_request_key);
         intent_notification_key = context.getString(R.string.notification_key);
         intent_category_key = context.getString(R.string.category_key);
@@ -51,7 +51,7 @@ public class Notifications {
 
         Log.d(TAG, "addNotification: " + category + " key " + key);
 
-        HashMap<String, StatusBarNotification> map = getMapByCategory(category);
+        ConcurrentHashMap<String, StatusBarNotification> map = getMapByCategory(category);
 
         addNotificationExtras(context, notification, category, key);
 
@@ -61,7 +61,7 @@ public class Notifications {
     }
 
     public void removeNotification(String category, String key) {
-        HashMap<String, StatusBarNotification> map;
+        ConcurrentHashMap<String, StatusBarNotification> map;
         if (category == null) {
             map = social.containsKey(key) ? social : (news.containsKey(key) ? news : (system.containsKey(key) ? system : rest));
         } else {
@@ -74,7 +74,7 @@ public class Notifications {
         }
     }
 
-    public HashMap<String, StatusBarNotification> getMapByCategory(@Constants.CategoryDef String category) {
+    public ConcurrentHashMap<String, StatusBarNotification> getMapByCategory(@Constants.CategoryDef String category) {
         switch (category) {
             case Constants.CATEGORY_SOCIAL:
                 return social;
@@ -89,10 +89,10 @@ public class Notifications {
         return null;
     }
 
-    synchronized public void changeCategory(String pkgname, @Constants.CategoryDef String category) {
+    public void changeCategory(String pkgname, @Constants.CategoryDef String category) {
 
-        HashMap<String, StatusBarNotification> receiver;
-        ArrayList<HashMap<String, StatusBarNotification>> maps = new ArrayList<>();
+        ConcurrentHashMap<String, StatusBarNotification> receiver;
+        ArrayList<ConcurrentHashMap<String, StatusBarNotification>> maps = new ArrayList<>();
         Log.d(TAG, "notifyCategoryChanged: " + pkgname + " category " + category);
         switch (category) {
             case Constants.CATEGORY_SOCIAL:
@@ -122,7 +122,7 @@ public class Notifications {
                 break;
         }
 
-        for (HashMap<String, StatusBarNotification> map : maps) {
+        for (ConcurrentHashMap<String, StatusBarNotification> map : maps) {
 
             Iterator<StatusBarNotification> iterator = map.values().iterator();
             while (iterator.hasNext()) {
@@ -130,14 +130,14 @@ public class Notifications {
                 if (notification.getPackageName().replace('.', '-').equals(pkgname)) {
                     String key = getKey(notification);
                     receiver.put(key, notification);
-                    iterator.remove();
+                    map.remove(key);
                 }
             }
 
         }
     }
 
-    public HashMap<String, StatusBarNotification> getMapByRequestCode(@Constants.RequestCode int requestCode) {
+    public ConcurrentHashMap<String, StatusBarNotification> getMapByRequestCode(@Constants.RequestCode int requestCode) {
         switch (requestCode) {
             case Constants.REQUEST_CODE_SOCIAL:
                 return social;
