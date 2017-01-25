@@ -1,4 +1,4 @@
-package com.flair.blurb;
+package com.flair.blurb.service;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,6 +11,8 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.NotificationCompat;
 import android.widget.RemoteViews;
 
+import com.flair.blurb.Constants;
+import com.flair.blurb.R;
 import com.flair.blurb.data.Notifications;
 import com.flair.blurb.firebase.AppCategoryChangeListener;
 import com.flair.blurb.firebase.DataChangeNotfier;

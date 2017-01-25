@@ -7,6 +7,7 @@
     <dimen name="icon_container_dimension">56dp</dimen>
     <dimen name="icon_dimension">24dp</dimen>
     <dimen name="text_size">11sp</dimen>
+    <dimen name="notification_label_margin_top">8dp</dimen>
 
     <!--Actvity Dimensions-->
     <dimen name="toolbar_icon_container_dimension">48dp</dimen>
@@ -19,6 +20,15 @@
     <dimen name="blurb_icon_b_elevation">4dp</dimen>
     <dimen name="blurb_icon_bell_elevation">2dp</dimen>
 
+    <dimen name="blurb_icon_frame_dimension">256dp</dimen>
+    <dimen name="blurb_icon_big_b_bg_dimension">232dp</dimen>
+    <dimen name="blurb_icon_bell_width">72dp</dimen>
+    <dimen name="blurb_icon_bell_height">64dp</dimen>
+    <dimen name="blurb_icon_bell_margin_end">8dp</dimen>
+    <dimen name="blurb_icon_bell_margin_top">32dp</dimen>
+    <dimen name="blurb_icon_big_b_width">155dp</dimen>
+    <dimen name="blurb_icon_big_b_height">220dp</dimen>
+
     <dimen name="header_elevation">4dp</dimen>
 
     <dimen name="fab_margin_end">16dp</dimen>
@@ -27,4 +37,13 @@
     <dimen name="upcoming_features_header_margin_start">16dp</dimen>
 
     <dimen name="widget_dimension">40dp</dimen>
+    <dimen name="chart_width">256dp</dimen>
+    <dimen name="chart_height">200dp</dimen>
+    <dimen name="chart_bar_spacing">36dp</dimen>
+    <dimen name="chart_spacing">16sp</dimen>
+    <dimen name="chart_bar_round_radius">2dp</dimen>
+
+    <dimen name="summary_text_size">18sp</dimen>
+    <dimen name="summary_text_margin_top">16dp</dimen>
+    <dimen name="summary_text_margin_bottom">40dp</dimen>
 </resources>

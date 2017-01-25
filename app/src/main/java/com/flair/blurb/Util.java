@@ -8,6 +8,8 @@ import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.View;
 
+import com.flair.blurb.service.BlurbNotificationService;
+
 import java.util.HashMap;
 import java.util.Iterator;
 

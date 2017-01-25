@@ -94,7 +94,7 @@ public class StatsProvider extends ContentProvider {
     private Cursor getStatsData(Uri uri, String[] projection, String selection, String[] selArgs, String sortOrder) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String tablename = uri.getLastPathSegment();
-        return db.query(tablename, projection, selection, selArgs, null, null, sortOrder);
+        return db.query(tablename, projection, selection, selArgs, StatsContract.StatsEntry.COLUMN_CATEGORY, null, sortOrder);
     }
 
     private Cursor getStatsDataItem(Uri uri, String[] projection, String sortOrder) {

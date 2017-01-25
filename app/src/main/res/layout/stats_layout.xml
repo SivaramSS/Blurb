@@ -26,11 +26,37 @@
 
     </FrameLayout>
 
-    <ImageView
-        android:layout_width="160dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="200dp"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_notifications_off" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
+
+        <com.db.chart.view.BarChartView xmlns:chart="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/chart_height"
+            android:layout_gravity="center"
+            android:layout_marginEnd="@dimen/chart_spacing"
+            android:layout_marginStart="@dimen/chart_spacing"
+            chart:chart_barSpacing="@dimen/chart_bar_spacing" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/summary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/summary_text_margin_bottom"
+        android:layout_marginTop="@dimen/summary_text_margin_top"
+        android:textColor="@color/text_black_87_percent"
+        android:textSize="@dimen/summary_text_size" />
 
 </LinearLayout>

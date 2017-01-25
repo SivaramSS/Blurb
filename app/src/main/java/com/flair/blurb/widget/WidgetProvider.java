@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.flair.blurb.BlurbNotificationService;
+import com.flair.blurb.service.BlurbNotificationService;
 import com.flair.blurb.Constants;
 import com.flair.blurb.R;
 

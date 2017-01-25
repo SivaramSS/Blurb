@@ -22,5 +22,6 @@
     <color name="enabled_b">#F5F5F5</color>
 
     <color name="divider">#1FF5F5F5</color>
-
+    <color name="green">#19AF5C</color>
+    <color name="text_black_87_percent">#DE000000</color>
 </resources>

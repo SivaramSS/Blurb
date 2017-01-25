@@ -15,4 +15,9 @@
     <string name="bottom_sheet_header_label">Notification Stats</string>
     <string name="upcoming_features_label">Upcoming Features</string>
     <string name="widget_id_key">widget_id_key</string>
+    <string name="summary_text">Total notifications received </string>
+    <string name="share_app_text">Hey! I just found this awesome app on play store. Check it out!</string>
+    <string name="blurb_stopped">Blurb has been stopped from running</string>
+    <string name="blurb_notification_access_request">Blurb requires your permission to access notifcations</string>
+    <string name="notification_access_enabled_key">fdgshghjlkjk</string>
 </resources>

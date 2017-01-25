@@ -1,4 +1,4 @@
-package com.flair.blurb;
+package com.flair.blurb.service;
 
 import android.app.ActivityManager;
 import android.app.NotificationManager;
@@ -6,13 +6,19 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.flair.blurb.Constants;
+import com.flair.blurb.R;
+import com.flair.blurb.Util;
 import com.flair.blurb.data.Apps;
 import com.flair.blurb.data.Notifications;
 import com.flair.blurb.db.StatsContract;
@@ -47,10 +53,31 @@ public class BlurbNotificationService extends NotificationListenerService implem
     NotificationCompat.Builder blurbNotificationBuilder;
     RemoteViews contentView;
     ActivityManager activityManager;
+    boolean isNotficationAccessEnabled;
 
     public BlurbNotificationService() {
         super();
         helper = BlurbHelper.getInstance();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind: ");
+        isNotficationAccessEnabled = true;
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putBoolean(getString(R.string.notification_access_enabled_key), isNotficationAccessEnabled);
+        editor.apply();
+        return super.onBind(intent);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.d(TAG, "onUnbind: ");
+        isNotficationAccessEnabled = false;
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putBoolean(getString(R.string.notification_access_enabled_key), isNotficationAccessEnabled);
+        editor.apply();
+        return super.onUnbind(intent);
     }
 
     /**

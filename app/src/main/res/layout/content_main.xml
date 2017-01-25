@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/content_main"
+    android:clickable="true"
+    android:focusable="true"
     android:layout_below="@+id/appbar"
     android:layout_above="@+id/stats_layout"
     android:orientation="vertical">
@@ -14,29 +16,31 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="256dp"
-            android:layout_height="256dp"
+            android:layout_width="@dimen/blurb_icon_frame_dimension"
+            android:layout_height="@dimen/blurb_icon_frame_dimension"
             android:layout_gravity="center"
             android:src="@drawable/ic_background" />
 
         <FrameLayout
+            android:id="@+id/blurb_activator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:elevation="@dimen/blurb_icon_bg_elevation">
 
             <ImageView
-                android:layout_width="232dp"
-                android:layout_height="232dp"
+                android:layout_width="@dimen/blurb_icon_big_b_bg_dimension"
+                android:layout_height="@dimen/blurb_icon_big_b_bg_dimension"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_background_big_b" />
 
             <ImageView
-                android:layout_width="72dp"
-                android:layout_height="64dp"
+                android:layout_width="@dimen/blurb_icon_bell_width"
+                android:layout_height="@dimen/blurb_icon_bell_height"
                 android:layout_gravity="top|end"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginEnd="@dimen/blurb_icon_bell_margin_end"
+                android:layout_marginTop="@dimen/blurb_icon_bell_margin_top"
                 android:elevation="@dimen/blurb_icon_bell_elevation"
                 android:src="@drawable/ic_bell" />
 
@@ -47,8 +51,9 @@
                 android:elevation="@dimen/blurb_icon_b_elevation">
 
                 <ImageView
-                    android:layout_width="155dp"
-                    android:layout_height="220dp"
+                    android:id="@+id/big_b"
+                    android:layout_width="@dimen/blurb_icon_big_b_width"
+                    android:layout_height="@dimen/blurb_icon_big_b_height"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_big_b" />
 

@@ -11,7 +11,8 @@ import java.lang.annotation.RetentionPolicy;
  */
 
 public class Constants {
-    static final int BLURB_NOTIFICATION_ID = 5555;
+    public static final int BLURB_NOTIFICATION_ID = 5555;
+    public static final int BLURB_LOADER_ID = 2695;
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({CATEGORY_UNCATEGORIZED, CATEGORY_SOCIAL, CATEGORY_SYSTEM, CATEGORY_NEWS, CATEGORY_PROMOTIONS, CATEGORY_IMPORTANT})
@@ -33,6 +34,5 @@ public class Constants {
     public static final int REQUEST_CODE_MORE = 4444;
     public static final int REQUEST_DELETE_NOTIFICATION = 7777;
     public static final int REQUEST_STOP_BLURB = 8888;
-
     public static final int REQUEST_CODE_WIDGET = 262626;
 }

@@ -2,13 +2,20 @@ package com.flair.blurb.ui;
 
 import android.animation.Animator;
 import android.app.LoaderManager;
+import android.app.NotificationManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.drawable.VectorDrawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -17,14 +24,19 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.ScaleAnimation;
+import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.flair.blurb.Constants;
 import com.flair.blurb.R;
 import com.flair.blurb.Util;
 import com.flair.blurb.db.StatsContract;
+import com.flair.blurb.service.BlurbNotificationService;
 
-public class BlurbOn extends AppCompatActivity implements View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
-    private static final int BLURB_LOADER_ID = 2695;
+public class BlurbOn extends AppCompatActivity implements View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener {
+
     private static final String TAG = BlurbOn.class.getSimpleName();
+    private static final String PROJECTION_COUNT_BY_CATEGORY = "COUNT(" + StatsContract.StatsEntry.COLUMN_CATEGORY + ")";
     Toolbar toolbar;
     FloatingActionButton statsFab;
     BottomSheetBehavior behavior;
@@ -33,8 +45,10 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
     Animator reveal, hide;
     ScaleAnimation bubble, shrink;
     View upcomingIcon, backIcon;
+    ImageView big_b;
     DisplayUpcomingFeatures displayUpcomingFeatures;
     DisplayStats displayStats;
+    boolean isServiceActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +59,9 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         animTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+
         statsFab = ((FloatingActionButton) findViewById(R.id.fab_stats));
         upcomingFeaturesLayout = findViewById(R.id.upcoming_features_layout);
         statsLayout = findViewById(R.id.stats_layout);
@@ -52,6 +69,8 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
         contentMain = findViewById(R.id.content_main);
         upcomingIcon = findViewById(R.id.upcoming_features);
         backIcon = findViewById(R.id.back_upcoming_features);
+        big_b = findViewById(R.id.big_b);
+        findViewById(R.id.blurb_activator).setOnClickListener(this);
 
         upcomingIcon.setOnClickListener(this);
         findViewById(R.id.share_container).setOnClickListener(this);
@@ -66,7 +85,8 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
 
         backIcon.setOnClickListener(this);
         displayStats = new DisplayStats(this, statsLayout);
-        getLoaderManager().initLoader(BLURB_LOADER_ID, null, this);
+
+        getLoaderManager().initLoader(Constants.BLURB_LOADER_ID, null, this);
     }
 
     public void loadAnim(ScaleAnimation anim) {
@@ -77,7 +97,11 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.blurb_activator:
+                blurbActivation();
+                break;
             case R.id.share_container:
+                shareThisApp();
                 break;
             case R.id.upcoming_features:
                 if (upcomingFeaturesLayout.getVisibility() == View.INVISIBLE) {
@@ -98,6 +122,9 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
     BottomSheetBehavior.BottomSheetCallback callback = new BottomSheetBehavior.BottomSheetCallback() {
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
+            if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                displayStats.showStats();
+            }
         }
 
         @Override
@@ -169,8 +196,8 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = new String[]{StatsContract.StatsEntry.COLUMN_KEY, StatsContract.StatsEntry.COLUMN_CATEGORY, StatsContract.StatsEntry.COLUMN_TIMESTAMP};
-        return new CursorLoader(this, StatsContract.StatsEntry.CONTENT_URI, projection, null, null, StatsContract.StatsEntry.COLUMN_TIMESTAMP + " DESC");
+        String[] projection = new String[]{StatsContract.StatsEntry.COLUMN_CATEGORY, PROJECTION_COUNT_BY_CATEGORY};
+        return new CursorLoader(this, StatsContract.StatsEntry.CONTENT_URI, projection, null, null, null);
     }
 
     @Override
@@ -180,5 +207,41 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    public void shareThisApp() {
+        String text = getString(R.string.share_app_text);
+        text = text.concat(" https://play.google.com/store/apps/details?id="+getPackageName());
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+        shareIntent.setType("text/plain");
+        startActivity(shareIntent);
+    }
+
+
+    public void blurbActivation() {
+        if(isServiceActive) {
+            ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(Constants.BLURB_NOTIFICATION_ID);
+            stopService(new Intent(this, BlurbNotificationService.class));
+            Toast.makeText(this, getString(R.string.blurb_stopped), Toast.LENGTH_SHORT).show();
+
+        } else {
+            startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS));
+            Toast.makeText(this, getString(R.string.blurb_notification_access_request), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(getString(R.string.notification_access_enabled_key))) {
+            isServiceActive = sharedPreferences.getBoolean(key, false);
+        }
+    }
+
+    private changeBigBColor(boolean serviceActive) {
+        VectorDrawable drawable = ((VectorDrawable) big_b.getDrawable());
+        if(isServiceActive) {
+
+        }
     }
 }
