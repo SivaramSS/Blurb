@@ -95,7 +95,8 @@ public class DisplayStats {
                 totalcount += data.getInt(1);
                 dataset.addBar(bar);
             }
-            steps = totalcount / 4;
+            steps = totalcount / data.getCount();
+            steps = steps == 0? 1 : steps;
             dataset.setColor(barColor);
             return null;
         }
