@@ -65,7 +65,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
         Log.d(TAG, "onBind: ");
         isNotficationAccessEnabled = true;
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putBoolean(getString(R.string.notification_access_enabled_key), isNotficationAccessEnabled);
+        editor.putBoolean(getString(R.string.pref_notification_access_granted_key), isNotficationAccessEnabled);
         editor.apply();
         return super.onBind(intent);
     }
@@ -75,7 +75,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
         Log.d(TAG, "onUnbind: ");
         isNotficationAccessEnabled = false;
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putBoolean(getString(R.string.notification_access_enabled_key), isNotficationAccessEnabled);
+        editor.putBoolean(getString(R.string.pref_notification_access_granted_key), isNotficationAccessEnabled);
         editor.apply();
         return super.onUnbind(intent);
     }

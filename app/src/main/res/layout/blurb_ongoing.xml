@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:baselineAligned="false"
     android:clickable="true"
     android:focusable="true"
     android:orientation="horizontal">
@@ -19,6 +20,7 @@
             android:layout_width="@dimen/icon_dimension"
             android:layout_height="@dimen/icon_dimension"
             android:layout_gravity="center"
+            android:contentDescription="@string/ongoing_ic_social_description"
             android:src="@drawable/ic_social" />
 
         <TextView
@@ -47,6 +49,7 @@
             android:layout_width="@dimen/icon_dimension"
             android:layout_height="@dimen/icon_dimension"
             android:layout_gravity="center"
+            android:contentDescription="@string/ongoing_ic_news_description"
             android:src="@drawable/ic_news" />
 
         <TextView
@@ -75,6 +78,7 @@
             android:layout_width="@dimen/icon_dimension"
             android:layout_height="@dimen/icon_dimension"
             android:layout_gravity="center"
+            android:contentDescription="@string/ongoing_ic_system_description"
             android:src="@drawable/ic_settings" />
 
         <TextView
@@ -103,6 +107,7 @@
             android:layout_width="@dimen/icon_dimension"
             android:layout_height="@dimen/icon_dimension"
             android:layout_gravity="center"
+            android:contentDescription="@string/ongoing_ic_rest_description"
             android:src="@drawable/ic_more" />
 
         <TextView

@@ -33,6 +33,7 @@ import com.flair.blurb.R;
 import com.flair.blurb.Util;
 import com.flair.blurb.db.StatsContract;
 import com.flair.blurb.service.BlurbNotificationService;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
@@ -51,7 +52,9 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
     ImageView big_b;
     DisplayUpcomingFeatures displayUpcomingFeatures;
     DisplayStats displayStats;
-    boolean isServiceActive = false;
+    boolean notificationAccessGranted = false;
+    static String preference_notificaion_access_granted_key;
+    private FirebaseAnalytics firebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +64,8 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         animTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);
-
-        SharedPreferences prefs = getDefaultSharedPreferences(this);
-        prefs.registerOnSharedPreferenceChangeListener(this);
+        preference_notificaion_access_granted_key = getString(R.string.pref_notification_access_granted_key);
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         statsFab = ((FloatingActionButton) findViewById(R.id.fab_stats));
         upcomingFeaturesLayout = findViewById(R.id.upcoming_features_layout);
@@ -92,6 +94,15 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
         getLoaderManager().initLoader(Constants.BLURB_LOADER_ID, null, this);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        SharedPreferences prefs = getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+        notificationAccessGranted = prefs.getBoolean(preference_notificaion_access_granted_key, false);
+        changeBigBColor(notificationAccessGranted);
+    }
+
     public void loadAnim(ScaleAnimation anim) {
         anim.setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
         anim.setInterpolator(new OvershootInterpolator());
@@ -101,6 +112,11 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.blurb_activator:
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "R.id.blurb_activator");
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "blurb_activator");
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 blurbActivation();
                 break;
             case R.id.share_container:
@@ -227,27 +243,27 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
 
 
     public void blurbActivation() {
-        isServiceActive = getDefaultSharedPreferences(this).getBoolean(getString(R.string.notification_access_enabled_key), false);
-        if (isServiceActive) {
+        notificationAccessGranted = getDefaultSharedPreferences(this).getBoolean(preference_notificaion_access_granted_key, false);
+        if (notificationAccessGranted) {
             ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(Constants.BLURB_NOTIFICATION_ID);
             stopService(new Intent(this, BlurbNotificationService.class));
             Toast.makeText(this, getString(R.string.blurb_stopped), Toast.LENGTH_SHORT).show();
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            editor.putBoolean(getString(R.string.notification_access_enabled_key), false);
+            editor.putBoolean(preference_notificaion_access_granted_key, false);
             editor.apply();
         } else {
             startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS));
             Toast.makeText(this, getString(R.string.blurb_notification_access_request), Toast.LENGTH_LONG).show();
         }
-        changeBigBColor(isServiceActive);
+        changeBigBColor(notificationAccessGranted);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(R.string.notification_access_enabled_key))) {
+        if (key.equals(preference_notificaion_access_granted_key)) {
             Log.d(TAG, "onSharedPreferenceChanged: ");
-            isServiceActive = sharedPreferences.getBoolean(key, false);
-            changeBigBColor(isServiceActive);
+            notificationAccessGranted = sharedPreferences.getBoolean(key, false);
+            changeBigBColor(notificationAccessGranted);
         }
     }
 

@@ -10,7 +10,7 @@
     app:layout_behavior="@string/bottom_sheet_behavior">
 
     <LinearLayout
-        android:id="@+id/header"
+        android:id="@+id/header_stats_layout"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:animateLayoutChanges="true"
@@ -31,6 +31,7 @@
                 android:layout_width="@dimen/icon_dimension"
                 android:layout_height="@dimen/icon_dimension"
                 android:layout_gravity="center"
+                android:contentDescription="@string/stats_layout_back"
                 android:src="@drawable/ic_back" />
 
         </FrameLayout>

@@ -48,11 +48,6 @@ public class DisplayStats {
                 ((BlurbOn) context).behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
-        statsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
     }
 
     public void loadStats(Cursor data) {
