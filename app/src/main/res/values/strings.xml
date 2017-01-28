@@ -8,7 +8,7 @@
     <string name="posted_by_blurb">!258fYfl10@5</string>
     <string name="default_category_to_show_key">default_category_to_show</string>
     <string name="package_key">package_key</string>
-    <string name="dismiss_action_label">Dismiss</string>
+    <string name="dismiss_action_label">DISMISS</string>
     <string name="do_not_disturb_action_label">DND</string>
     <string name="action_label_share">SHARE</string>
     <string name="bottom_sheet_header_label">Notification Stats</string>
@@ -16,9 +16,11 @@
     <string name="widget_id_key">widget_id_key</string>
     <string name="summary_text">Total notifications received </string>
     <string name="share_app_text">Hey! I just found this awesome app on play store. Check it out!</string>
-    <string name="blurb_stopped">Blurb has been stopped from running</string>
+    <string name="blurb_stopped">Turning off Blurb Notification</string>
     <string name="blurb_notification_access_request">Blurb requires your permission to access notifcations</string>
     <string name="pref_notification_access_granted_key">pref_notification_access_granted_key</string>
+    <string name="pref_service_running_key">pref_service_running_key</string>
+    <string name="pref_blurb_notification_enabled">pref_blurb_notification_enabled</string>
 
     <!--Content Descriptions-->
     <string name="blurb_activate_description">Activate Blurb</string>

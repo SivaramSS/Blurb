@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.VectorDrawable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
@@ -53,8 +52,9 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
     DisplayUpcomingFeatures displayUpcomingFeatures;
     DisplayStats displayStats;
     boolean notificationAccessGranted = false;
-    static String preference_notificaion_access_granted_key;
+    static String preference_notificaion_access_granted_key, pref_service_running_key, pref_blurb_notification_enabled_key;
     private FirebaseAnalytics firebaseAnalytics;
+    boolean isServiceRunning, isBlurbNotificationShowing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +65,9 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         animTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);
         preference_notificaion_access_granted_key = getString(R.string.pref_notification_access_granted_key);
+        pref_service_running_key = getString(R.string.pref_service_running_key);
+        pref_blurb_notification_enabled_key = getString(R.string.pref_blurb_notification_enabled);
+
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         statsFab = ((FloatingActionButton) findViewById(R.id.fab_stats));
@@ -100,7 +103,9 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
         SharedPreferences prefs = getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         notificationAccessGranted = prefs.getBoolean(preference_notificaion_access_granted_key, false);
-        changeBigBColor(notificationAccessGranted);
+        isServiceRunning = prefs.getBoolean(pref_service_running_key, false);
+        isBlurbNotificationShowing = prefs.getBoolean(pref_blurb_notification_enabled_key, false);
+        changeBigBColor(isBlurbNotificationShowing);
     }
 
     public void loadAnim(ScaleAnimation anim) {
@@ -244,18 +249,19 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
 
     public void blurbActivation() {
         notificationAccessGranted = getDefaultSharedPreferences(this).getBoolean(preference_notificaion_access_granted_key, false);
-        if (notificationAccessGranted) {
+        if (isBlurbNotificationShowing) {
             ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(Constants.BLURB_NOTIFICATION_ID);
-            stopService(new Intent(this, BlurbNotificationService.class));
             Toast.makeText(this, getString(R.string.blurb_stopped), Toast.LENGTH_SHORT).show();
-            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            editor.putBoolean(preference_notificaion_access_granted_key, false);
-            editor.apply();
         } else {
-            startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS));
-            Toast.makeText(this, getString(R.string.blurb_notification_access_request), Toast.LENGTH_LONG).show();
+            if(!notificationAccessGranted) {
+                startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS));
+                Toast.makeText(this, getString(R.string.blurb_notification_access_request), Toast.LENGTH_LONG).show();
+            } else if(isServiceRunning) {
+                startService(new Intent(this, BlurbNotificationService.class).putExtra(getString(R.string.intent_request_key), Constants.REQUEST_START_BLURB));
+            } else {
+                Toast.makeText(this, "There was a problem starting the service", Toast.LENGTH_SHORT).show();
+            }
         }
-        changeBigBColor(notificationAccessGranted);
     }
 
     @Override
@@ -263,7 +269,15 @@ public class BlurbOn extends AppCompatActivity implements View.OnClickListener, 
         if (key.equals(preference_notificaion_access_granted_key)) {
             Log.d(TAG, "onSharedPreferenceChanged: ");
             notificationAccessGranted = sharedPreferences.getBoolean(key, false);
-            changeBigBColor(notificationAccessGranted);
+        }
+        else if(key.equals(pref_service_running_key)) {
+            Log.d(TAG, "onSharedPreferenceChanged: ");
+            isServiceRunning = sharedPreferences.getBoolean(key, false);
+            changeBigBColor(isServiceRunning);
+        }
+        else if(key.equals(pref_blurb_notification_enabled_key)) {
+            isBlurbNotificationShowing = sharedPreferences.getBoolean(pref_blurb_notification_enabled_key, false);
+            changeBigBColor(isBlurbNotificationShowing);
         }
     }
 

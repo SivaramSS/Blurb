@@ -1,5 +1,6 @@
 package com.flair.blurb.service;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -29,7 +30,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 public class BlurbHelper {
 
     private static BlurbHelper ourInstance = new BlurbHelper();
-    RemoteViews contentView;
+    RemoteViews contentView, bigContentView;
 
     public static BlurbHelper getInstance() {
         return ourInstance;
@@ -71,37 +72,52 @@ public class BlurbHelper {
     NotificationCompat.Builder postBlurbNotification(Context context) {
         NotificationManager nm = ((NotificationManager) context.getSystemService(NOTIFICATION_SERVICE));
         contentView = new RemoteViews(context.getPackageName(), R.layout.blurb_ongoing);
+        bigContentView = new RemoteViews(context.getPackageName(), R.layout.expanded_notifcation_layout);
 
         PendingIntent social = PendingIntent.getService(context, Constants.REQUEST_CODE_SOCIAL, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_SOCIAL), PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent news = PendingIntent.getService(context, Constants.REQUEST_CODE_NEWS, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_NEWS), PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent system = PendingIntent.getService(context, Constants.REQUEST_CODE_SYSTEM, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_SYSTEM), PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent more = PendingIntent.getService(context, Constants.REQUEST_CODE_MORE, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_CODE_MORE), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent dismiss = PendingIntent.getService(context, Constants.REQUEST_STOP_BLURB, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_STOP_BLURB), PendingIntent.FLAG_UPDATE_CURRENT);
 
         contentView.setOnClickPendingIntent(R.id.social, social);
         contentView.setOnClickPendingIntent(R.id.news, news);
         contentView.setOnClickPendingIntent(R.id.system, system);
         contentView.setOnClickPendingIntent(R.id.more, more);
 
-        contentView.setTextViewText(R.id.social_count, 0 + "");
-        contentView.setTextViewText(R.id.news_count, 0 + "");
-        contentView.setTextViewText(R.id.system_count, 0 + "");
-        contentView.setTextViewText(R.id.rest_count, 0 + "");
+        bigContentView.setOnClickPendingIntent(R.id.social, social);
+        bigContentView.setOnClickPendingIntent(R.id.news, news);
+        bigContentView.setOnClickPendingIntent(R.id.system, system);
+        bigContentView.setOnClickPendingIntent(R.id.more, more);
+        bigContentView.setOnClickPendingIntent(R.id.dismiss, dismiss);
 
-        PendingIntent dismiss = PendingIntent.getService(context, Constants.REQUEST_STOP_BLURB, new Intent(context, BlurbNotificationService.class).putExtra(Notifications.intent_request_key, Constants.REQUEST_STOP_BLURB), PendingIntent.FLAG_UPDATE_CURRENT);
+//        contentView.setTextViewText(R.id.social_count, 0 + "");
+//        contentView.setTextViewText(R.id.news_count, 0 + "");
+//        contentView.setTextViewText(R.id.system_count, 0 + "");
+//        contentView.setTextViewText(R.id.rest_count, 0 + "");
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 
         builder.setSmallIcon(R.mipmap.ic_launcher)
-                .setContent(contentView)
-//                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-//                .addAction(R.drawable.ic_dismiss, context.getString(R.string.dismiss_action_label), dismiss)
+                .setCustomContentView(contentView)
+                .setCustomBigContentView(bigContentView)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setOngoing(true);
 
-        nm.notify(Constants.BLURB_NOTIFICATION_ID, builder.build());
+        Notification notification = builder.build();
+        nm.notify(Constants.BLURB_NOTIFICATION_ID, notification);
+
+        SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        edit.putBoolean(context.getString(R.string.pref_blurb_notification_enabled), true);
+        edit.apply();
         return builder;
     }
 
     public RemoteViews getContentView() {
         return contentView;
+    }
+
+    public RemoteViews getBigContentView() {
+        return bigContentView;
     }
 }

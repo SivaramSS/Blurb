@@ -15,6 +15,7 @@ import android.service.notification.StatusBarNotification;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.flair.blurb.Constants;
 import com.flair.blurb.R;
@@ -51,7 +52,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
     Notifications activeNotifications;
     Apps applist;
     NotificationCompat.Builder blurbNotificationBuilder;
-    RemoteViews contentView;
+    RemoteViews contentView, bigContentView;
     ActivityManager activityManager;
     boolean isNotficationAccessEnabled;
 
@@ -76,8 +77,21 @@ public class BlurbNotificationService extends NotificationListenerService implem
         isNotficationAccessEnabled = false;
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
         editor.putBoolean(getString(R.string.pref_notification_access_granted_key), isNotficationAccessEnabled);
+        editor.putBoolean(getString(R.string.pref_service_running_key), false);
+        editor.putBoolean(getString(R.string.pref_blurb_notification_enabled), false);
         editor.apply();
+        notificationManager.cancel(Constants.BLURB_NOTIFICATION_ID);
         return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onListenerDisconnected() {
+        super.onListenerDisconnected();
+        Log.d(TAG, "onListenerDisconnected: ");
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        notificationManager.cancel(Constants.BLURB_NOTIFICATION_ID);
+        editor.putBoolean(getString(R.string.pref_service_running_key), false);
+        editor.apply();
     }
 
     /**
@@ -89,10 +103,15 @@ public class BlurbNotificationService extends NotificationListenerService implem
      * dismiss them except default category
      */
 
+
     @Override
     public void onListenerConnected() {
         super.onListenerConnected();
         Log.d(TAG, "onListenerConnected: ");
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putBoolean(getString(R.string.pref_service_running_key), true);
+        editor.apply();
+
         activityManager = ((ActivityManager) getSystemService(ACTIVITY_SERVICE));
         notificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
         active_category = helper.defaultCategoryToShow(this);
@@ -104,6 +123,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
         helper.categorizeInstalledApps(this, this);
         blurbNotificationBuilder = helper.postBlurbNotification(this);
         contentView = helper.getContentView();
+        bigContentView = helper.getBigContentView();
 
         //Categorize active notifcations and post only active_category
         StatusBarNotification[] notifications = getActiveNotifications();
@@ -137,12 +157,12 @@ public class BlurbNotificationService extends NotificationListenerService implem
 //                }
 //            }
 //        }
-    }
-
-    @Override
-    public void onListenerDisconnected() {
-        super.onListenerDisconnected();
-        Log.d(TAG, "onListenerDisconnected: ");
+        if(statusBarNotification.getId() == Constants.BLURB_NOTIFICATION_ID) {
+            Log.d(TAG, "onNotificationRemoved: blurb");
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            editor.putBoolean(getString(R.string.pref_blurb_notification_enabled), false);
+            editor.apply();
+        }
     }
 
     String classifyNotification(StatusBarNotification notification) {
@@ -201,6 +221,21 @@ public class BlurbNotificationService extends NotificationListenerService implem
 
         Log.d(TAG, "onStartCommand: " + request);
 
+        if(request == Constants.REQUEST_START_BLURB) {
+            helper.postBlurbNotification(this);
+            contentView = helper.getContentView();
+            bigContentView = helper.getBigContentView();
+            refreshCount();
+            Toast.makeText(this, "Blurb is On", Toast.LENGTH_SHORT).show();
+            SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            edit.putBoolean(getString(R.string.pref_blurb_notification_enabled), true);
+            edit.apply();
+        }
+
+        if(request == Constants.REQUEST_STOP_BLURB) {
+            notificationManager.cancel(Constants.BLURB_NOTIFICATION_ID);
+        }
+
         if (request == Constants.REQUEST_DELETE_NOTIFICATION) {
             String key = intent.getStringExtra(Notifications.intent_notification_key);
             String category = intent.getStringExtra(Notifications.intent_category_key);
@@ -216,6 +251,10 @@ public class BlurbNotificationService extends NotificationListenerService implem
             int[] appWidgetIds = intent.getIntArrayExtra(getString(R.string.widget_id_key));
             updateWidgets(appWidgetIds);
             requestListenerHints(notificationsOn ? 0 : NotificationListenerService.HINT_HOST_DISABLE_EFFECTS);
+        }
+
+        if(request == Constants.REQUEST_STOP_BLURB) {
+            Log.d(TAG, "onStartCommand: stop blurb");
         }
 
         notifications = activeNotifications.getMapByRequestCode(request);
@@ -274,7 +313,13 @@ public class BlurbNotificationService extends NotificationListenerService implem
         contentView.setTextViewText(R.id.system_count, activeNotifications.getSystemCount());
         contentView.setTextViewText(R.id.rest_count, activeNotifications.getRestCount());
 
-        blurbNotificationBuilder.setContent(contentView);
+        bigContentView.setTextViewText(R.id.social_count, activeNotifications.getSocialCount());
+        bigContentView.setTextViewText(R.id.news_count, activeNotifications.getNewsCount());
+        bigContentView.setTextViewText(R.id.system_count, activeNotifications.getSystemCount());
+        bigContentView.setTextViewText(R.id.rest_count, activeNotifications.getRestCount());
+
+        blurbNotificationBuilder.setCustomContentView(contentView);
+        blurbNotificationBuilder.setCustomBigContentView(bigContentView);
         notificationManager.notify(Constants.BLURB_NOTIFICATION_ID, blurbNotificationBuilder.build());
     }
 
