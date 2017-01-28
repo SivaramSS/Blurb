@@ -44,9 +44,9 @@ public class BlurbNotificationService extends NotificationListenerService implem
     boolean notificationsOn = true;
     String posted_by_blurb;
     @Constants.CategoryDef
-    String default_category;
+    String active_category;
     @Constants.RequestCode
-    int selected_category;
+    int last_made_category_request;
     NotificationManager notificationManager;
     Notifications activeNotifications;
     Apps applist;
@@ -95,7 +95,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
         Log.d(TAG, "onListenerConnected: ");
         activityManager = ((ActivityManager) getSystemService(ACTIVITY_SERVICE));
         notificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
-        default_category = helper.defaultCategoryToShow(this);
+        active_category = helper.defaultCategoryToShow(this);
         posted_by_blurb = getString(R.string.posted_by_blurb);
 
         activeNotifications = new Notifications(this);
@@ -105,7 +105,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
         blurbNotificationBuilder = helper.postBlurbNotification(this);
         contentView = helper.getContentView();
 
-        //Categorize active notifcations and post only default_category
+        //Categorize active notifcations and post only active_category
         StatusBarNotification[] notifications = getActiveNotifications();
         for (StatusBarNotification notification : notifications) {
             classifyNotification(notification);
@@ -146,24 +146,21 @@ public class BlurbNotificationService extends NotificationListenerService implem
     }
 
     String classifyNotification(StatusBarNotification notification) {
-        String tag = notification.getTag();
-        if (tag == null || !notification.getPackageName().equals(getPackageName())) { //Omit classifying notifications posted by blurb
-            String key = Util.getKey(notification);
-            Log.d(TAG, "classifyNotification: " + notification.getPackageName() + " tag " + tag);
-            if (!notification.isOngoing() && notification.getId() != Constants.BLURB_NOTIFICATION_ID && !activeNotifications.containsKey(key)) {
-                String pkgname = notification.getPackageName().replace('.', '-');
-                @Constants.CategoryDef String category = applist.getCategory(pkgname);
-                category = category == null ? Constants.CATEGORY_UNCATEGORIZED : category;
-                activeNotifications.addNotification(category, notification);
-                insertIntoDb(notification, category);
-                dismissNotification(notification);
-                if (category.equals(default_category)) {
-                    postNotification(notification.getPackageName(), notification);
-                }
-                refreshCount();
-                return category;
+
+        if (shouldBeInserted(notification)) {
+            String pkgname = notification.getPackageName().replace('.', '-');
+            @Constants.CategoryDef String category = applist.getCategory(pkgname);
+            category = category == null ? Constants.CATEGORY_UNCATEGORIZED : category;
+            activeNotifications.addNotification(category, notification, this);
+            insertIntoDb(notification, category);
+            dismissNotification(notification);
+            if (category.equals(active_category)) {
+                postNotification(notification.getPackageName(), notification);
             }
+            refreshCount();
+            return category;
         }
+
         return null;
     }
 
@@ -176,9 +173,9 @@ public class BlurbNotificationService extends NotificationListenerService implem
         activeNotifications.changeCategory(pkgname, category);
 
         //Refresh active notifications
-        if (category.equals(Util.getCategoryForRequestcode(selected_category))) {
+        if (category.equals(active_category)) {
             dismissAllNotifications();
-            ConcurrentHashMap<String, StatusBarNotification> notifications = activeNotifications.getMapByRequestCode(selected_category);
+            ConcurrentHashMap<String, StatusBarNotification> notifications = activeNotifications.getMapByRequestCode(last_made_category_request);
             if (notifications != null) {
                 Iterator<StatusBarNotification> iterator = notifications.values().iterator();
                 while (iterator.hasNext()) {
@@ -214,19 +211,20 @@ public class BlurbNotificationService extends NotificationListenerService implem
             return result;
         }
 
-        if(request == Constants.REQUEST_CODE_WIDGET) {
+        if (request == Constants.REQUEST_CODE_WIDGET) {
             notificationsOn = !notificationsOn;
 //            requestInterruptionFilter();
             int[] appWidgetIds = intent.getIntArrayExtra(getString(R.string.widget_id_key));
             updateWidgets(appWidgetIds);
-            requestListenerHints(notificationsOn? 0 : NotificationListenerService.HINT_HOST_DISABLE_EFFECTS);
+            requestListenerHints(notificationsOn ? 0 : NotificationListenerService.HINT_HOST_DISABLE_EFFECTS);
         }
 
         notifications = activeNotifications.getMapByRequestCode(request);
         dismissAllNotifications();
         //On clicking category we post the notification with tweaks
         if (notifications != null) {
-            selected_category = request;
+            last_made_category_request = request;
+            active_category = Util.getCategoryForRequestcode(request);
             Iterator<StatusBarNotification> iter = notifications.values().iterator();
             while (iter.hasNext()) {
                 StatusBarNotification notification = iter.next();
@@ -295,8 +293,17 @@ public class BlurbNotificationService extends NotificationListenerService implem
                 .putExtra(getString(R.string.intent_request_key), Constants.REQUEST_CODE_WIDGET)
                 .putExtra(getString(R.string.widget_id_key), ids), PendingIntent.FLAG_UPDATE_CURRENT);
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.widget_layout);
-        remoteViews.setImageViewResource(R.id.button_dnd, notificationsOn? R.drawable.ic_notifications_on : R.drawable.ic_notifications_off);
+        remoteViews.setImageViewResource(R.id.button_dnd, notificationsOn ? R.drawable.ic_notifications_on : R.drawable.ic_notifications_off);
         remoteViews.setOnClickPendingIntent(R.id.button_dnd, pendingIntent);
         manager.updateAppWidget(ids, remoteViews);
+    }
+
+    private boolean shouldBeInserted(StatusBarNotification notification) {
+        return ( (notification.getTag() == null || !notification.getPackageName().equals(getPackageName()))
+                  && (!notification.isOngoing()
+                       && notification.getId() != Constants.BLURB_NOTIFICATION_ID
+                       && !activeNotifications.containsKey(Util.getKey(notification))
+                )
+        );
     }
 }

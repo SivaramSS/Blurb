@@ -1,6 +1,7 @@
 package com.flair.blurb.data;
 
 import android.content.Context;
+import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
@@ -13,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.flair.blurb.Util.addNotificationExtras;
 import static com.flair.blurb.Util.getKey;
+import static com.flair.blurb.Util.mergeNotifications;
 
 /**
  * Created by sivaram-3911 on 13/01/17.
@@ -45,7 +47,7 @@ public class Notifications {
         return social.containsKey(key) || news.containsKey(key) || system.containsKey(key) || rest.containsKey(key);
     }
 
-    public void addNotification(@Constants.CategoryDef String category, StatusBarNotification notification) {
+    public void addNotification(@Constants.CategoryDef String category, StatusBarNotification notification, NotificationListenerService service) {
 
         String key = getKey(notification);
 
@@ -55,9 +57,12 @@ public class Notifications {
 
         addNotificationExtras(context, notification, category, key);
 
-//        mergeNotifications(map, notification);
+//        if (!Util.mergeNotifications(map, notification)) {
+//            map.put(key, notification);
+//        }
+        mergeNotifications(map, notification, service);
 
-        map.put(key, notification);
+        map.put(getKey(notification), notification);
     }
 
     public void removeNotification(String category, String key) {

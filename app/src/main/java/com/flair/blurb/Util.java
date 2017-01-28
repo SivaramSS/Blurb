@@ -4,14 +4,15 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.View;
 
 import com.flair.blurb.service.BlurbNotificationService;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.flair.blurb.data.Notifications.intent_category_key;
 import static com.flair.blurb.data.Notifications.intent_notification_key;
@@ -33,6 +34,7 @@ public class Util {
         return notification.getKey();
     }
 
+    @Constants.CategoryDef
     public static String getCategoryForRequestcode(@Constants.RequestCode int request) {
         switch (request) {
             case Constants.REQUEST_CODE_MORE:
@@ -64,24 +66,32 @@ public class Util {
         notification.getNotification().flags = notification.getNotification().flags | Notification.FLAG_AUTO_CANCEL;
     }
 
-    public static void mergeNotifications(HashMap<String, StatusBarNotification> map, StatusBarNotification notification) {
+    public static void mergeNotifications(ConcurrentHashMap<String, StatusBarNotification> map, StatusBarNotification notification, NotificationListenerService service) {
 
         Iterator<StatusBarNotification> iter = map.values().iterator();
 
         while (iter.hasNext()) {
+
             StatusBarNotification n = iter.next();
-            if (n.getPackageName().equals(notification.getPackageName())) {
-                if (n.getId() == notification.getId()) {
-                    iter.remove();
-                    map.put(getKey(notification), notification);
-                    Log.d(TAG, "mergeNotifications: " + notification.getId() + " " + getKey(notification));
-                    break;
-                }
+
+            if (n.getPackageName().equals(notification.getPackageName()) && n.getId() == notification.getId()) {
+
+                Log.d(TAG, "mergeNotifications: merging "+notification.getPackageName()+" ID "+notification.getId());
+                /**The new notification has same ID but different key.
+                 * So we must remove our old notification object*/
+                iter.remove();
+                service.cancelNotification(n.getKey());
+//                n.getNotification().contentIntent = notification.getNotification().contentIntent;
+//                map.put(Util.getKey(notification), n);
+//                return true;
+
             }
         }
+//        return false;
     }
 
     public static int[] getCenterCoordsOfView(View view) {
         return new int[]{view.getLeft() + view.getWidth() / 2, view.getTop() + view.getHeight() / 2};
     }
+
 }
