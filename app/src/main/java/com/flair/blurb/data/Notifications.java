@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.flair.blurb.Util.addNotificationExtras;
 import static com.flair.blurb.Util.getKey;
 import static com.flair.blurb.Util.mergeNotifications;
 
@@ -55,7 +54,7 @@ public class Notifications {
 
         ConcurrentHashMap<String, StatusBarNotification> map = getMapByCategory(category);
 
-        addNotificationExtras(context, notification, category, key);
+//        addNotificationExtras(context, notification, category, key);
 
 //        if (!Util.mergeNotifications(map, notification)) {
 //            map.put(key, notification);

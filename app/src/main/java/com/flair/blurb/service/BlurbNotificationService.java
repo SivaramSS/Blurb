@@ -155,7 +155,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
             insertIntoDb(notification, category);
             dismissNotification(notification);
             if (category.equals(active_category)) {
-                postNotification(notification.getPackageName(), notification);
+                postNotification(notification.getPackageName(), category, notification);
             }
             refreshCount();
             return category;
@@ -180,8 +180,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
                 Iterator<StatusBarNotification> iterator = notifications.values().iterator();
                 while (iterator.hasNext()) {
                     StatusBarNotification notification = iterator.next();
-                    Util.addNotificationExtras(this, notification, category, Util.getKey(notification));
-                    postNotification(notification.getPackageName(), notification);
+                    postNotification(notification.getPackageName(), category, notification);
                     updateDb(notification, category);
                 }
             }
@@ -228,7 +227,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
             Iterator<StatusBarNotification> iter = notifications.values().iterator();
             while (iter.hasNext()) {
                 StatusBarNotification notification = iter.next();
-                postNotification(notification.getPackageName(), notification);
+                postNotification(notification.getPackageName(), active_category, notification);
             }
             refreshCount();
         }
@@ -238,7 +237,14 @@ public class BlurbNotificationService extends NotificationListenerService implem
 
 
     public void dismissAllNotifications() {
-        cancelAllNotifications();
+        StatusBarNotification[] sbn = getActiveNotifications();
+        for (int c = 0; c < sbn.length; c++) {
+            StatusBarNotification notification = sbn[c];
+            if(notification.getNotification().deleteIntent!=null) {
+                notification.getNotification().deleteIntent.cancel();
+            }
+            cancelNotification(Util.getKey(notification));
+        }
     }
 
     public void dismissNotification(StatusBarNotification statusBarNotification) {
@@ -249,8 +255,9 @@ public class BlurbNotificationService extends NotificationListenerService implem
         }
     }
 
-    private void postNotification(String origpkgname, StatusBarNotification notification) {
+    private void postNotification(String origpkgname, String category, StatusBarNotification notification) {
         Log.d(TAG, "postNotification: notification id " + notification.getId());
+        Util.addNotificationExtras(this, notification, category, Util.getKey(notification));
         notificationManager.notify(origpkgname, notification.getId(), notification.getNotification());
     }
 
