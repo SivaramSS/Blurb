@@ -44,6 +44,9 @@
             android:authorities="com.flair.blurb"
             android:exported="true" />
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="d747ae118d471c16e8114fdc75fd07e66a6ae261" />
     </application>
 
 </manifest>

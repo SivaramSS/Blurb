@@ -17,6 +17,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.flair.blurb.Constants;
 import com.flair.blurb.R;
 import com.flair.blurb.Util;
@@ -29,6 +30,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by sivaram-3911 on 24/12/16.
@@ -107,6 +110,7 @@ public class BlurbNotificationService extends NotificationListenerService implem
     @Override
     public void onListenerConnected() {
         super.onListenerConnected();
+        Fabric.with(this, new Crashlytics());
         Log.d(TAG, "onListenerConnected: ");
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
         editor.putBoolean(getString(R.string.pref_service_running_key), true);
