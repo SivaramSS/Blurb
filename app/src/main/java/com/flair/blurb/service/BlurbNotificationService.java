@@ -284,7 +284,11 @@ public class BlurbNotificationService extends NotificationListenerService implem
         for (int c = 0; c < sbn.length; c++) {
             StatusBarNotification notification = sbn[c];
             if(notification.getNotification().deleteIntent!=null) {
-                notification.getNotification().deleteIntent.cancel();
+                try {
+                    notification.getNotification().deleteIntent.cancel();
+                } catch (SecurityException exception) {
+                    Log.d(TAG, "dismissAllNotifications: Security exception on cancelling deleteIntent "+notification.getPackageName());
+                }
             }
             cancelNotification(Util.getKey(notification));
         }
